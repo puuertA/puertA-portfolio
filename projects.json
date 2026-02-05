@@ -74,6 +74,26 @@
       ]
     },
     {
+      "id": "hormatech",
+      "title": "HormaTech",
+      "status": "finished",
+      "description": "Sistema web interativo desenvolvido para auxiliar estudos de medicina veterinária. Implementa gráficos dinâmicos e filtros avançados usando HTML, CSS e JavaScript puro.",
+      "tags": [
+        { "name": "HTML", "class": "tag-html" },
+        { "name": "CSS", "class": "tag-css" },
+        { "name": "JavaScript", "class": "tag-js" }
+      ],
+      "buttons": [
+        {
+          "text": "Live Demo",
+          "url": "https://hormatech.netlify.app",
+          "class": "btn-outline",
+          "target": "_blank"
+        }
+      ],
+      "images": []
+    },
+    {
       "id": "editor-texto",
       "title": "Editor de Texto",
       "status": "finished",
