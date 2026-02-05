@@ -1,0 +1,120 @@
+{
+  "projects": [
+    {
+      "id": "basiliskscan",
+      "title": "BasiliskScan",
+      "status": "in-development",
+      "description": "Ferramenta de análise de vulnerabilidades e scanning de segurança. Identifica falhas em aplicações e infraestrutura.",
+      "tags": [
+        { "name": "Python", "class": "tag-python" },
+        { "name": "Security", "class": "tag-security" },
+        { "name": "CLI", "class": "tag-cli" }
+      ],
+      "buttons": [
+        {
+          "text": "Ver Repositório",
+          "url": "https://github.com/puuertA/BasiliskScan",
+          "class": "btn-secondary",
+          "target": "_blank"
+        }
+      ],
+      "images": []
+    },
+    {
+      "id": "anomtalk",
+      "title": "AnomTalk",
+      "status": "finished",
+      "description": "Plataforma de chat anônimo em tempo real com salas temporárias. Sem cadastros, login ou dados pessoais - apenas entre e comece a conversar! Mensagens instantâneas via WebSocket.",
+      "tags": [
+        { "name": "Next.js", "class": "tag-react" },
+        { "name": "TypeScript", "class": "tag-typescript" },
+        { "name": "Socket.io", "class": "tag-node" }
+      ],
+      "buttons": [
+        {
+          "text": "Ver Repositório",
+          "url": "https://github.com/puuertA/anomtalk",
+          "class": "btn-secondary",
+          "target": "_blank"
+        },
+        {
+          "text": "Live Demo",
+          "url": "https://anomtalk.netlify.app/",
+          "class": "btn-outline",
+          "target": "_blank"
+        }
+      ],
+      "images": []
+    },
+    {
+      "id": "sgn",
+      "title": "SGN",
+      "status": "finished",
+      "description": "Sistema de gerenciamento completo com dashboard interativo, autenticação e controle de permissões. Projeto desenvolvido para a faculdade na Fábrica de Software Acadêmica.",
+      "tags": [
+        { "name": "React", "class": "tag-react" },
+        { "name": "Node.js", "class": "tag-node" },
+        { "name": "MySQL", "class": "tag-mysql" }
+      ],
+      "buttons": [],
+      "info": "Projeto desenvolvido para a faculdade. O repositório é privado por conter informações sensíveis.",
+      "images": [
+        {
+          "src": "resources/sgn-screenshot-1.png",
+          "alt": "SGN Dashboard"
+        },
+        {
+          "src": "resources/sgn-screenshot-2.png",
+          "alt": "SGN Login"
+        },
+        {
+          "src": "resources/sgn-screenshot-3.png",
+          "alt": "SGN Features"
+        }
+      ]
+    },
+    {
+      "id": "editor-texto",
+      "title": "Editor de Texto",
+      "status": "finished",
+      "description": "Editor de texto básico desenvolvido em linguagem C pura. Projeto acadêmico da disciplina de Estrutura de Dados II com implementação de estruturas fundamentais.",
+      "tags": [
+        { "name": "C", "class": "tag-c" },
+        { "name": "CLI", "class": "tag-cli" }
+      ],
+      "buttons": [
+        {
+          "text": "Ver Repositório",
+          "url": "https://github.com/puuertA/editor-de-texto",
+          "class": "btn-secondary",
+          "target": "_blank"
+        }
+      ],
+      "images": []
+    },
+    {
+      "id": "portfolio",
+      "title": "Portfolio Website",
+      "status": "in-development",
+      "description": "Site pessoal desenvolvido com design neobrutalista moderno, responsivo e otimizado para performance.",
+      "tags": [
+        { "name": "HTML", "class": "tag-html" },
+        { "name": "CSS", "class": "tag-css" },
+        { "name": "JavaScript", "class": "tag-js" }
+      ],
+      "buttons": [
+        {
+          "text": "Ver Repositório",
+          "url": "#",
+          "class": "btn-secondary"
+        },
+        {
+          "text": "Live Demo",
+          "url": "#",
+          "class": "btn-outline"
+        }
+      ],
+      "images": []
+    }
+  ]
+}

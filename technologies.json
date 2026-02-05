@@ -1,0 +1,144 @@
+{
+  "techStacks": [
+    {
+      "id": "frontend",
+      "title": "🎨 Frontend",
+      "technologies": [
+        {
+          "name": "HTML5",
+          "icon": "devicon-html5-plain colored",
+          "level": 95
+        },
+        {
+          "name": "CSS3",
+          "icon": "devicon-css3-plain colored",
+          "level": 90
+        },
+        {
+          "name": "JavaScript",
+          "icon": "devicon-javascript-plain colored",
+          "level": 90
+        },
+        {
+          "name": "TypeScript",
+          "icon": "devicon-typescript-plain colored",
+          "level": 80
+        },
+        {
+          "name": "React",
+          "icon": "devicon-react-original colored",
+          "level": 70
+        },
+        {
+          "name": "Angular",
+          "icon": "devicon-angularjs-plain colored",
+          "level": 65
+        },
+        {
+          "name": "Bootstrap",
+          "icon": "devicon-bootstrap-plain colored",
+          "level": 85
+        }
+      ]
+    },
+    {
+      "id": "backend",
+      "title": "⚙️ Backend",
+      "technologies": [
+        {
+          "name": "Node.js",
+          "icon": "devicon-nodejs-plain colored",
+          "level": 70
+        },
+        {
+          "name": "Python",
+          "icon": "devicon-python-plain colored",
+          "level": 80
+        },
+        {
+          "name": "Java",
+          "icon": "devicon-java-plain colored",
+          "level": 75
+        },
+        {
+          "name": "C",
+          "icon": "devicon-c-plain colored",
+          "level": 70
+        }
+      ]
+    },
+    {
+      "id": "database",
+      "title": "🗄️ Banco de Dados",
+      "technologies": [
+        {
+          "name": "MySQL",
+          "icon": "devicon-mysql-plain colored",
+          "level": 90
+        },
+        {
+          "name": "PostgreSQL",
+          "icon": "devicon-postgresql-plain colored",
+          "level": 85
+        }
+      ]
+    },
+    {
+      "id": "devops",
+      "title": "🔧 DevOps & Ferramentas",
+      "technologies": [
+        {
+          "name": "Git",
+          "icon": "devicon-git-plain colored",
+          "level": 80
+        },
+        {
+          "name": "GitHub",
+          "icon": "devicon-github-original",
+          "level": 85
+        },
+        {
+          "name": "Docker",
+          "icon": "devicon-docker-plain colored",
+          "level": 30
+        },
+        {
+          "name": "NPM",
+          "icon": "devicon-npm-original-wordmark colored",
+          "level": 80
+        }
+      ]
+    },
+    {
+      "id": "design",
+      "title": "🎨 Design & Documentação",
+      "technologies": [
+        {
+          "name": "Figma",
+          "icon": "devicon-figma-plain colored",
+          "level": 75
+        },
+        {
+          "name": "Photoshop",
+          "icon": "devicon-photoshop-plain colored",
+          "level": 60
+        },
+        {
+          "name": "After Effects",
+          "icon": "devicon-aftereffects-plain colored",
+          "level": 45
+        },
+        {
+          "name": "Markdown",
+          "icon": "devicon-markdown-original",
+          "level": 95
+        },
+        {
+          "name": "LaTeX",
+          "icon": "devicon-latex-original",
+          "level": 70
+        }
+      ]
+    }
+  ]
+}

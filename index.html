@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lucas - Desenvolvedor Full Stack</title>
+    <link rel="icon" type="image/x-icon" href="resources/favicons/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="resources/favicons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="resources/favicons/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="resources/favicons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="resources/favicons/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="resources/favicons/android-chrome-512x512.png">
+    <link rel="stylesheet" href="styles.css?v=2">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <!-- Font Awesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- DevIcons para logos de tecnologias -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css">
+</head>
+
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-logo">
+                <img src="resources/logopuerta.png" alt="Logo" class="loading-logo-img">
+            </div>
+            <div class="loading-text">
+                <h2 class="loading-title"><span
+                        style="color: #FF00FF; font-weight: 900; font-style: italic; text-transform: none;">puertA</span>
+                </h2>
+                <p class="loading-subtitle">Carregando portfólio...</p>
+            </div>
+            <div class="loading-bar-container">
+                <div class="loading-bar"></div>
+            </div>
+            <div class="loading-spinner">
+                <div class="spinner-dot"></div>
+                <div class="spinner-dot"></div>
+                <div class="spinner-dot"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Elementos Decorativos de Fundo -->
+    <div class="neo-decorations">
+        <div class="neo-star" style="top: 20%; left: 85%;"></div>
+        <div class="neo-circle" style="top: 60%; left: 5%;"></div>
+        <div class="neo-square" style="top: 80%; right: 10%;"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="header-text">
+                    <div class="header-title-wrapper">
+                        <img src="resources/logopuerta.png" alt="Logo" class="header-logo">
+                        <h1 class="header-title">
+                            <span>puertA</span>
+                        </h1>
+                    </div>
+                    <p class="header-subtitle">Desenvolvedor Full Stack</p>
+                </div>
+                <nav class="nav" id="nav">
+                    <a href="#sobre" class="nav-link">Sobre</a>
+                    <a href="#projetos" class="nav-link">Projetos</a>
+                    <a href="#tecnologias" class="nav-link">Tecnologias</a>
+                    <a href="#contato" class="nav-link">Contato</a>
+                    <a href="https://github.com/puuertA" target="_blank" class="nav-link nav-link-highlight">GitHub</a>
+                </nav>
+                <button class="theme-toggle" id="themeToggle" aria-label="Alternar tema">
+                    <span class="theme-icon sun">☀️</span>
+                    <span class="theme-icon moon">🌙</span>
+                </button>
+                <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Seção de Boas-vindas com Animação -->
+    <section class="section section-welcome">
+        <div class="container">
+            <div class="welcome-content">
+                <span class="wave-emoji">👋</span>
+                <h2 class="wave-text">
+                    <span class="wave-letter">O</span><span class="wave-letter">l</span><span
+                        class="wave-letter">á</span><span class="wave-letter">,</span>
+                    <span class="wave-space"> </span>
+                    <span class="wave-letter">s</span><span class="wave-letter">e</span><span
+                        class="wave-letter">j</span><span class="wave-letter">a</span>
+                    <span class="wave-space"> </span>
+                    <span class="wave-letter">b</span><span class="wave-letter">e</span><span
+                        class="wave-letter">m</span><span class="wave-letter">-</span><span
+                        class="wave-letter">v</span><span class="wave-letter">i</span><span
+                        class="wave-letter">n</span><span class="wave-letter">d</span><span
+                        class="wave-letter">o</span><span class="wave-letter">!</span>
+                </h2>
+            </div>
+        </div>
+    </section>
+
+    <!-- Seção Sobre -->
+    <section class="section section-sobre" id="sobre">
+        <div class="container">
+            <div class="sobre-grid">
+                <div class="sobre-image-wrapper">
+                    <div class="sobre-image">
+                        <img src="resources/fotolucas.png" alt="Foto de Lucas">
+                    </div>
+                </div>
+                <div class="sobre-content">
+                    <h2 class="section-title">Sobre Mim</h2>
+                    <div class="sobre-card">
+                        <div class="sobre-text">
+                            <h3 style="font-size: 1.8rem;">Lucas Cano <span
+                                    style="color: #FF00FF; font-weight: 900; font-style: italic; text-transform: none;">@puertA</span>
+                            </h3>
+                            <p>
+                                Desenvolvedor full stack focado em segurança de software, automação e design de
+                                interfaces.
+                                Cursando Bacharelado em Ciência da Computação, trabalho com aplicações web, APIs e
+                                ferramentas CLI utilizando JavaScript, TypeScript, Python, Node.js e React.
+
+                                Também atuo na criação de interfaces modernas e identidades visuais para projetos
+                                digitais,
+                                unindo funcionalidade, estética e usabilidade.
+
+                                Atualmente desenvolvo o BasiliskScan, uma ferramenta para detecção de dependências
+                                vulneráveis em sistemas web, como parte do meu TCC.
+
+                            </p>
+                        </div>
+                        <a href="resources/CV Lucas Puerta.pdf" download class="btn btn-primary">Baixar CV</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Seção Projetos -->
+    <section class="section section-projetos" id="projetos">
+        <div class="container">
+            <h2 class="section-title">Projetos em Destaque</h2>
+            <div class="projetos-carousel-wrapper">
+                <button class="project-nav project-prev" onclick="changeProject(-1)"
+                    aria-label="Projeto anterior">‹</button>
+                <div class="projetos-carousel" id="projectsCarousel">
+                    <!-- Projetos serão carregados dinamicamente aqui -->
+                </div>
+                <button class="project-nav project-next" onclick="changeProject(1)"
+                    aria-label="Próximo projeto">›</button>
+                <div class="project-indicators" id="projectIndicators">
+                    <!-- Indicadores serão gerados dinamicamente -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Seção Tecnologias -->
+    <section class="section section-tecnologias" id="tecnologias">
+        <div class="container">
+            <h2 class="section-title">Tecnologias & Habilidades</h2>
+            <div id="techStacksContainer">
+                <!-- Tech stacks serão carregados dinamicamente aqui -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Seção Contato -->
+    <section class="section section-contato" id="contato">
+        <div class="container">
+            <h2 class="section-title">Vamos Conversar?</h2>
+
+            <div class="contato-wrapper">
+
+                <!-- Formulário de Contato -->
+                <div class="contato-form-container">
+                    <h3 class="contato-subtitle">📧 Me envie uma mensagem</h3>
+                    <form class="contato-form" id="contactForm" action="https://formsubmit.co/lucaspuerta1@hotmail.com"
+                        method="POST">
+                        <!-- Campos ocultos para configuração do FormSubmit -->
+                        <input type="hidden" name="_subject" value="Nova mensagem do portfólio!">
+                        <input type="hidden" name="_captcha" value="false">
+                        <input type="hidden" name="_template" value="table">
+                        <input type="hidden" name="_next" value="http://127.0.0.1:5500/index.html#contato">
+                        <input type="text" name="_honey" style="display:none">
+
+                        <div class="form-group">
+                            <label for="name">Nome</label>
+                            <input type="text" id="name" name="name" required placeholder="Seu nome" class="form-input">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" required placeholder="seu@email.com"
+                                class="form-input">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="subject">Assunto</label>
+                            <input type="text" id="subject" name="subject" required placeholder="Assunto da mensagem"
+                                class="form-input">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="message">Mensagem</label>
+                            <textarea id="message" name="message" required placeholder="Digite sua mensagem aqui..."
+                                class="form-textarea" rows="5"></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-large btn-block">
+                            Enviar Mensagem
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Redes Sociais -->
+                <div class="contato-social-container">
+                    <h3 class="contato-subtitle">🔗 Conecte-se comigo</h3>
+
+                    <div class="social-links">
+                        <a href="https://github.com/puuertA/" target="_blank" class="social-card">
+                            <div class="social-icon">
+                                <i class="fab fa-github"></i>
+                            </div>
+                            <div class="social-info">
+                                <h4>GitHub</h4>
+                                <p>github.com/puuertA</p>
+                            </div>
+                        </a>
+
+                        <a href="https://www.linkedin.com/in/lucas-cano-puerta/" target="_blank" class="social-card">
+                            <div class="social-icon">
+                                <i class="fab fa-linkedin"></i>
+                            </div>
+                            <div class="social-info">
+                                <h4>LinkedIn</h4>
+                                <p>linkedin.com/in/lucas-cano-puerta</p>
+                            </div>
+                        </a>
+                    </div>
+
+                    <a href="https://www.linkedin.com/messaging/compose/?recipient=lucas-cano-puerta&subject=Olá%20Lucas!&body=Olá%20Lucas,%20visitei%20seu%20portfólio%20e%20gostaria%20de%20conversar%20sobre%20oportunidades%20de%20colaboração."
+                        target="_blank" class="btn btn-primary btn-large btn-linkedin">
+                        💼 Me chamar no LinkedIn
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 puertA. Desenvolvido com ☕ e código.</p>
+        </div>
+    </footer>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Lightbox -->
+    <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+        <button class="lightbox-close" onclick="closeLightbox()" aria-label="Fechar">×</button>
+        <img id="lightboxImage" class="lightbox-content" src="" alt="">
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
