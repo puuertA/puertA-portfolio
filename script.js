@@ -234,6 +234,53 @@ function initPinnedCameraSequence() {
     });
 }
 
+function initTechnologyScrollAnimations() {
+    if (!window.gsap || !window.ScrollTrigger) return;
+
+    gsap.utils.toArray('.tech-stack:not([data-motion-bound])').forEach((stack, index) => {
+        stack.dataset.motionBound = 'true';
+
+        gsap.fromTo(stack,
+            { y: 50, opacity: 0, rotate: index % 2 ? 1.5 : -1.5 },
+            {
+                y: 0,
+                opacity: 1,
+                rotate: 0,
+                duration: 0.7,
+                ease: 'power3.out',
+                scrollTrigger: {
+                    trigger: stack,
+                    start: 'top 82%',
+                    end: 'bottom 12%',
+                    toggleActions: 'play reverse play reverse'
+                }
+            }
+        );
+
+        const list = stack.querySelector('.tech-list');
+        if (!list) return;
+
+        gsap.fromTo(list.querySelectorAll('.tech-item'),
+            { y: 28, scale: 0.82, opacity: 0, rotate: -4 },
+            {
+                y: 0,
+                scale: 1,
+                opacity: 1,
+                rotate: 0,
+                duration: 0.7,
+                stagger: 0.045,
+                ease: 'expo.out',
+                scrollTrigger: {
+                    trigger: list,
+                    start: 'top 86%',
+                    end: 'bottom 10%',
+                    toggleActions: 'play reverse play reverse'
+                }
+            }
+        );
+    });
+}
+
 function initScrollAnimations() {
     if (!window.gsap || !window.ScrollTrigger) return;
 
@@ -329,7 +376,7 @@ function initScrollAnimations() {
         }
     );
 
-    gsap.utils.toArray('.sobre-card, .tech-stack, .contato-form-container, .contato-social-container').forEach((el, index) => {
+    gsap.utils.toArray('.sobre-card, .contato-form-container, .contato-social-container').forEach((el, index) => {
         gsap.fromTo(el,
             { y: 50, opacity: 0, rotate: index % 2 ? 1.5 : -1.5 },
             {
@@ -348,26 +395,7 @@ function initScrollAnimations() {
         );
     });
 
-    gsap.utils.toArray('.tech-list').forEach((list) => {
-        gsap.fromTo(list.querySelectorAll('.tech-item'),
-            { y: 28, scale: 0.82, opacity: 0, rotate: -4 },
-            {
-                y: 0,
-                scale: 1,
-                opacity: 1,
-                rotate: 0,
-                duration: 0.7,
-                stagger: 0.045,
-                ease: 'expo.out',
-                scrollTrigger: {
-                    trigger: list,
-                    start: 'top 86%',
-                    end: 'bottom 10%',
-                    toggleActions: 'play reverse play reverse'
-                }
-            }
-        );
-    });
+    initTechnologyScrollAnimations();
 
     gsap.utils.toArray('.project-card.active').forEach((card) => {
         gsap.fromTo(card,
@@ -1302,6 +1330,10 @@ function renderTechnologies(techStacks) {
             </div>
         `;
     }).join('');
+
+    if (motionStarted) {
+        initTechnologyScrollAnimations();
+    }
 }
 
 function animateTechBars() {
