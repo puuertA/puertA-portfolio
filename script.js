@@ -2,7 +2,6 @@
 // Motion Layer - Lenis + GSAP
 // ====================================
 let lenis = null;
-let portfolioDataReady = false;
 let loadingFinished = false;
 let motionStarted = false;
 
@@ -27,8 +26,10 @@ function initLenis() {
 
 function animatePageIntro() {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const releaseFirstPaint = () => document.documentElement.classList.remove('site-booting');
 
     if (!window.gsap) {
+        releaseFirstPaint();
         document.body.classList.add('hero-intro-complete');
         return;
     }
@@ -36,6 +37,7 @@ function animatePageIntro() {
     document.body.classList.add('gsap-ready');
 
     if (prefersReducedMotion) {
+        releaseFirstPaint();
         document.body.classList.add('hero-intro-complete');
         return;
     }
@@ -47,8 +49,10 @@ function animatePageIntro() {
     gsap.set('.hero-tension-bar', { scaleX: 0, transformOrigin: 'left center' });
     gsap.set('.hero-prelude', { autoAlpha: 0 });
     gsap.set('.hero-video', { autoAlpha: 0, scale: 1.12 });
+    gsap.set('.hero-title-accent', { clipPath: 'inset(0 100% 0 0)' });
 
     const heroTimeline = gsap.timeline({
+        paused: true,
         defaults: { ease: 'power3.out' },
         onComplete: () => {
             document.body.classList.add('hero-intro-complete');
@@ -87,8 +91,8 @@ function animatePageIntro() {
             stagger: 0.13,
             ease: 'expo.out'
         }, 1.37)
-        .from('.hero-title-accent', {
-            clipPath: 'inset(0 100% 0 0)',
+        .to('.hero-title-accent', {
+            clipPath: 'inset(0 0% 0 0)',
             duration: 0.72,
             ease: 'expo.inOut'
         }, 1.62)
@@ -99,6 +103,11 @@ function animatePageIntro() {
         .to('.hero-corner', { autoAlpha: 1, stagger: 0.08, duration: 0.65 }, 2.08)
         .to('.hero-scroll-indicator', { autoAlpha: 1, duration: 0.7 }, 2.2)
         .from('.hero-scroll-line', { scaleY: 0, transformOrigin: 'top', duration: 0.7 }, 2.18);
+
+    // A primeira pintura só é liberada depois de todos os estados iniciais
+    // da timeline existirem, evitando o flash do hero antes do loading.
+    releaseFirstPaint();
+    requestAnimationFrame(() => heroTimeline.play(0));
 }
 
 function initPinnedCameraSequence() {
@@ -125,11 +134,10 @@ function initPinnedCameraSequence() {
 
         gsap.set(sequenceItems, {
             autoAlpha: 0,
-            y: isMobile ? 72 : 110,
-            z: -90,
-            scale: 0.9,
-            rotateX: 9,
-            filter: 'blur(10px)',
+            y: isMobile ? 36 : 48,
+            z: -40,
+            scale: 0.96,
+            rotateX: 4,
             transformOrigin: 'center bottom'
         });
         gsap.set(progressFill, {
@@ -143,7 +151,7 @@ function initPinnedCameraSequence() {
             scrollTrigger: {
                 trigger: section,
                 start: 'top top',
-                end: () => `+=${Math.round(window.innerHeight * (isMobile ? 3.35 : 3.4))}`,
+                end: () => `+=${Math.round(window.innerHeight * (isMobile ? 3.1 : 3.15))}`,
                 pin: cameraPin,
                 pinSpacing: true,
                 scrub: 1.15,
@@ -209,10 +217,9 @@ function initPinnedCameraSequence() {
                 z: 0,
                 scale: 1,
                 rotateX: 0,
-                filter: 'blur(0px)',
                 duration: 0.8,
                 ease: 'power3.out'
-            }, 0.08 + (index * 0.2));
+            }, index * 0.2);
         });
 
         cameraTimeline.to(cameraWorld, {
@@ -412,7 +419,7 @@ function animateActiveProject(card) {
 }
 
 function startMotionWhenReady() {
-    if (motionStarted || !portfolioDataReady || !loadingFinished) return;
+    if (motionStarted || !loadingFinished) return;
 
     motionStarted = true;
     animatePageIntro();
@@ -1251,8 +1258,10 @@ function setProject(index) {
 
 window.addEventListener('load', async () => {
     await Promise.all([loadProjects(), loadTechnologies()]);
-    portfolioDataReady = true;
-    startMotionWhenReady();
+
+    if (motionStarted && window.ScrollTrigger) {
+        requestAnimationFrame(() => ScrollTrigger.refresh());
+    }
 });
 
 // ====================================

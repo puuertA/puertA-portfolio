@@ -315,6 +315,17 @@ body {
                 color 0.7s var(--ease-power3-out);
 }
 
+/* Evita que o hero apareça por um frame antes de o loading e o GSAP
+   prepararem os estados iniciais da entrada. */
+html.site-booting .header,
+html.site-booting .hero-stage,
+html.site-booting .hero-video,
+html.site-booting .hero-scroll-indicator,
+html.site-booting .hero-corner {
+    opacity: 0;
+    visibility: hidden;
+}
+
 /* ====================================
    Elementos Decorativos Neobrutalistas
    ==================================== */
@@ -3933,9 +3944,11 @@ body.dark-mode .fullscreen-hero.section-hero {
     --camera-frame: rgba(17, 17, 17, 0.82);
     min-height: 100vh;
     min-height: 100svh;
-    height: 100svh;
+    height: auto;
     padding: 0;
     position: relative;
+    z-index: 3;
+    overflow: visible;
     background: var(--camera-bg);
     color: var(--camera-ink);
 }
@@ -3953,6 +3966,7 @@ body.dark-mode .section-camera {
     min-height: 100svh;
     height: 100svh;
     position: relative;
+    z-index: 1;
     overflow: hidden;
     isolation: isolate;
     background: var(--camera-bg);
@@ -4202,7 +4216,7 @@ body.dark-mode .section-camera {
 }
 
 .camera-sequence-item {
-    will-change: transform, opacity, filter;
+    will-change: transform, opacity;
 }
 
 .camera-orbit {
