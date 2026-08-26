@@ -446,6 +446,82 @@ function animateActiveProject(card) {
     );
 }
 
+function initAboutPhotoHoverMotion() {
+    const wrapper = document.querySelector('.section-sobre .sobre-image-wrapper');
+    const decorations = wrapper ? Array.from(wrapper.querySelectorAll('.photo-decor')) : [];
+
+    if (!wrapper || decorations.length === 0 || !window.gsap) return;
+    if (wrapper.dataset.hoverMotionBound === 'true') return;
+
+    wrapper.dataset.hoverMotionBound = 'true';
+
+    const restingStates = [
+        { xPercent: 28, yPercent: 82, scale: 0.62, rotation: 18 },
+        { xPercent: -42, yPercent: 34, scale: 0.58, rotation: -20 },
+        { xPercent: 34, yPercent: -48, scale: 0.62, rotation: -15 },
+        { xPercent: -38, yPercent: -58, scale: 0.6, rotation: 17 }
+    ];
+
+    const desktopStates = [
+        { xPercent: -15, yPercent: -230, rotation: -8 },
+        { xPercent: 180, yPercent: -20, rotation: 16 },
+        { xPercent: -150, yPercent: 20, rotation: 7 },
+        { xPercent: 25, yPercent: 220, rotation: -10 }
+    ];
+
+    const mobileStates = [
+        { xPercent: -10, yPercent: -195, rotation: -8 },
+        { xPercent: 130, yPercent: -15, rotation: 16 },
+        { xPercent: -10, yPercent: 245, rotation: 7 },
+        { xPercent: 18, yPercent: 195, rotation: -10 }
+    ];
+
+    document.body.classList.add('photo-motion-ready');
+
+    decorations.forEach((decoration, index) => {
+        gsap.set(decoration, {
+            xPercent: restingStates[index].xPercent,
+            yPercent: restingStates[index].yPercent,
+            scale: restingStates[index].scale,
+            rotation: restingStates[index].rotation,
+            opacity: 0,
+            transformOrigin: '50% 50%'
+        });
+    });
+
+    const destination = window.matchMedia('(max-width: 768px)').matches
+        ? mobileStates
+        : desktopStates;
+
+    const hoverTimeline = gsap.timeline({ paused: true });
+
+    decorations.forEach((decoration, index) => {
+        hoverTimeline.to(decoration, {
+            xPercent: destination[index].xPercent,
+            yPercent: destination[index].yPercent,
+            rotation: destination[index].rotation,
+            scale: 1,
+            opacity: 1,
+            duration: 0.9,
+            ease: 'expo.out'
+        }, index * 0.08);
+    });
+
+    let touchOpen = false;
+
+    wrapper.addEventListener('mouseenter', () => hoverTimeline.play());
+    wrapper.addEventListener('mouseleave', () => hoverTimeline.reverse());
+
+    wrapper.addEventListener('pointerup', event => {
+        if (event.pointerType !== 'touch' && event.pointerType !== 'pen') return;
+        touchOpen = !touchOpen;
+        if (touchOpen) hoverTimeline.play();
+        else hoverTimeline.reverse();
+    });
+
+    if (wrapper.matches(':hover')) hoverTimeline.play();
+}
+
 function startMotionWhenReady() {
     if (motionStarted || !loadingFinished) return;
 
@@ -511,6 +587,7 @@ function initHeroVideoPlayback() {
 }
 
 initHeroVideoPlayback();
+initAboutPhotoHoverMotion();
 
 // ====================================
 // Loading Screen
