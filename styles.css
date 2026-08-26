@@ -3931,6 +3931,8 @@ body.dark-mode .fullscreen-hero.section-hero {
     --camera-ink: #111111;
     --camera-grid: rgba(17, 17, 17, 0.1);
     --camera-frame: rgba(17, 17, 17, 0.82);
+    min-height: 100vh;
+    min-height: 100svh;
     height: 100svh;
     padding: 0;
     position: relative;
@@ -3947,6 +3949,8 @@ body.dark-mode .section-camera {
 
 .camera-pin {
     width: 100%;
+    min-height: 100vh;
+    min-height: 100svh;
     height: 100svh;
     position: relative;
     overflow: hidden;
@@ -3960,13 +3964,34 @@ body.dark-mode .section-camera {
 .camera-grid {
     position: absolute;
     inset: -12%;
-    z-index: -3;
+    z-index: 0;
     background-image:
         linear-gradient(var(--camera-grid) 2px, transparent 2px),
         linear-gradient(90deg, var(--camera-grid) 2px, transparent 2px);
     background-size: 54px 54px;
     transform: rotate(-2deg) scale(1.08);
     will-change: transform, background-position;
+}
+
+.camera-section-number {
+    position: absolute;
+    right: clamp(1.5rem, 5vw, 5rem);
+    bottom: clamp(1.5rem, 3vh, 3rem);
+    z-index: 1;
+    display: block;
+    padding: 0.04em 0.04em 0.12em;
+    overflow: visible;
+    color: var(--camera-ink);
+    -webkit-text-stroke: 3px var(--camera-ink);
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(14rem, 34vw, 34rem);
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+    line-height: 0.82;
+    letter-spacing: -0.1em;
+    opacity: 0.065;
+    pointer-events: none;
+    user-select: none;
 }
 
 .camera-grid::after {
@@ -4045,14 +4070,6 @@ body.dark-mode .section-camera {
     font-weight: 900;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-}
-
-.camera-topbar span:last-child {
-    padding: 0.35rem 0.55rem;
-    background: #9AE66E;
-    border: 2px solid #111111;
-    color: #111111;
-    box-shadow: 3px 3px 0 #111111;
 }
 
 .camera-copy {
@@ -4190,7 +4207,7 @@ body.dark-mode .section-camera {
 
 .camera-orbit {
     position: absolute;
-    z-index: -1;
+    z-index: 1;
     display: block;
     border: 4px solid var(--camera-ink);
     pointer-events: none;
@@ -4282,13 +4299,17 @@ body.dark-mode .section-camera {
     .camera-world {
         width: 100%;
         min-height: 100svh;
-        padding: 6.7rem 1.1rem 4.2rem;
-        gap: 0.7rem;
+        padding: 5.85rem 1rem 3.4rem;
+        grid-template-rows: auto auto minmax(0, 1fr);
+        gap: 0.65rem;
     }
 
     .camera-topbar {
-        padding-right: 1.8rem;
-        font-size: 0.52rem;
+        position: relative;
+        z-index: 4;
+        padding-right: 0;
+        padding-bottom: 0.55rem;
+        font-size: 0.58rem;
     }
 
     .camera-copy {
@@ -4296,12 +4317,16 @@ body.dark-mode .section-camera {
     }
 
     .camera-kicker {
-        margin-bottom: 0.75rem;
-        font-size: 0.58rem;
+        margin-bottom: 0.6rem;
+        padding: 0.4rem 0.55rem;
+        border-width: 2px;
+        box-shadow: 3px 3px 0 #111111;
+        font-size: 0.55rem;
     }
 
     .camera-title {
-        font-size: clamp(2.75rem, 12.6vw, 4.4rem);
+        max-width: 100%;
+        font-size: clamp(2.35rem, 11.5vw, 4rem);
         line-height: 0.84;
     }
 
@@ -4321,22 +4346,50 @@ body.dark-mode .section-camera {
     }
 
     .camera-cards {
-        width: 270vw;
-        grid-template-columns: repeat(3, 86vw);
-        gap: 4vw;
+        width: 100%;
+        min-height: 0;
+        grid-template-columns: 1fr;
+        grid-template-rows: repeat(3, minmax(0, 1fr));
+        gap: 0.5rem;
     }
 
     .camera-card {
-        min-height: 138px;
-        padding: 0.85rem;
+        min-height: 0;
+        padding: 0.55rem 0.7rem;
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr);
+        grid-template-rows: auto auto;
+        grid-template-areas:
+            'index title'
+            'index copy';
+        align-content: center;
+        align-items: center;
+        column-gap: 0.7rem;
+        border-width: 3px;
+        box-shadow: 4px 4px 0 #111111;
+    }
+
+    .camera-card-index {
+        grid-area: index;
+        align-self: stretch;
+        min-width: 2.1rem;
+        margin: 0;
+        display: grid;
+        place-items: center;
     }
 
     .camera-card h3 {
-        font-size: 1.08rem;
+        grid-area: title;
+        margin: 0 0 0.15rem;
+        font-size: clamp(0.88rem, 4vw, 1.05rem);
+        line-height: 1.05;
     }
 
     .camera-card p {
-        font-size: 0.78rem;
+        grid-area: copy;
+        max-width: none;
+        font-size: clamp(0.66rem, 2.8vw, 0.76rem);
+        line-height: 1.25;
     }
 
     .camera-orbit-a {
@@ -4350,16 +4403,93 @@ body.dark-mode .section-camera {
     }
 
     .camera-progress {
+        top: auto;
+        left: 1rem;
         right: 1rem;
-        grid-template-rows: 80px auto;
+        bottom: 1rem;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        grid-template-rows: auto;
+        justify-items: stretch;
+        align-items: center;
+        transform: none;
     }
 
     .camera-progress-label {
-        display: none;
+        display: block;
+        writing-mode: initial;
+        transform: none;
     }
 
     .camera-progress-track {
-        height: 80px;
+        width: 100%;
+        height: 5px;
+    }
+
+    .camera-section-number {
+        right: -0.02em;
+        bottom: 2.2rem;
+        padding-bottom: 0.14em;
+        font-size: clamp(12rem, 64vw, 21rem);
+        -webkit-text-stroke-width: 2px;
+        line-height: 0.84;
+        opacity: 0.06;
+    }
+}
+
+@media (max-width: 390px) {
+    .camera-world {
+        padding-top: 5.55rem;
+        padding-inline: 0.85rem;
+        gap: 0.5rem;
+    }
+
+    .camera-title {
+        font-size: clamp(2.15rem, 10.9vw, 3.2rem);
+    }
+
+    .camera-card {
+        padding-block: 0.45rem;
+    }
+
+    .camera-card p {
+        font-size: 0.65rem;
+    }
+}
+
+@media (max-width: 900px) and (max-height: 600px) and (orientation: landscape) {
+    .camera-world {
+        padding: 5.4rem 2.25rem 2.25rem;
+        grid-template-columns: minmax(0, 0.86fr) minmax(0, 1.14fr);
+        grid-template-rows: auto minmax(0, 1fr);
+        gap: 0.65rem 1rem;
+    }
+
+    .camera-topbar {
+        grid-column: 1 / -1;
+    }
+
+    .camera-copy,
+    .camera-cards {
+        min-width: 0;
+    }
+
+    .camera-title {
+        font-size: clamp(2.15rem, 6.5vw, 3.5rem);
+    }
+
+    .camera-cards {
+        width: 100%;
+        grid-template-columns: 1fr;
+        gap: 0.45rem;
+    }
+
+    .camera-card {
+        min-height: 0;
+        padding: 0.45rem 0.6rem;
+    }
+
+    .camera-progress {
+        display: none;
     }
 }
 
@@ -4750,6 +4880,148 @@ body.dark-mode .section-contato {
     border-top: 2px solid var(--section-panel-line);
     font-size: clamp(1rem, 1.45vw, 1.16rem);
     line-height: 1.65;
+}
+
+.sobre-academic {
+    margin-top: clamp(1.5rem, 3vw, 2.5rem);
+    padding-top: clamp(1.25rem, 2.5vw, 2rem);
+    border-top: 4px solid var(--section-panel-line);
+}
+
+.academic-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.academic-label,
+.academic-semester,
+.academic-program > span,
+.academic-facts dt,
+.academic-coursework > span {
+    font-family: 'Courier New', monospace;
+    font-size: 0.68rem;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+}
+
+.academic-label,
+.academic-semester {
+    display: inline-flex;
+    align-items: center;
+    min-height: 36px;
+    padding: 0.55rem 0.65rem;
+    color: #111111;
+    border: 3px solid var(--section-panel-line);
+}
+
+.academic-label {
+    background: var(--section-accent);
+    box-shadow: 4px 4px 0 var(--section-panel-line);
+}
+
+.academic-semester {
+    background: var(--section-accent-alt);
+}
+
+.academic-program {
+    padding: clamp(1rem, 2.5vw, 1.5rem);
+    color: var(--section-panel);
+    background: var(--section-panel-ink);
+    border: 3px solid var(--section-panel-line);
+}
+
+.academic-program > span {
+    display: block;
+    margin-bottom: 0.8rem;
+    opacity: 0.72;
+}
+
+.academic-program h4 {
+    max-width: 18ch;
+    margin: 0;
+    font-size: clamp(1.65rem, 3.4vw, 3rem);
+    font-weight: 900;
+    line-height: 0.95;
+    letter-spacing: -0.055em;
+    text-transform: uppercase;
+}
+
+.academic-program p {
+    margin: 1rem 0 0;
+    font-size: 0.86rem;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+.academic-facts {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin: 0;
+    border: 3px solid var(--section-panel-line);
+    border-top: 0;
+}
+
+.academic-facts > div {
+    min-width: 0;
+    padding: 0.9rem;
+}
+
+.academic-facts > div + div {
+    border-left: 2px solid var(--section-panel-line);
+}
+
+.academic-facts dt {
+    margin-bottom: 0.5rem;
+    color: var(--section-accent-alt);
+}
+
+.academic-facts dd {
+    margin: 0;
+    font-size: 0.82rem;
+    font-weight: 800;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+
+.academic-coursework {
+    margin-top: 1rem;
+    padding: 1rem;
+    border: 3px solid var(--section-panel-line);
+}
+
+.academic-coursework > span {
+    display: block;
+    margin-bottom: 0.8rem;
+}
+
+.academic-coursework ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.academic-coursework li {
+    padding: 0.45rem 0.55rem;
+    color: #111111;
+    background: var(--section-accent);
+    border: 2px solid #111111;
+    font-family: 'Courier New', monospace;
+    font-size: 0.63rem;
+    font-weight: 900;
+    line-height: 1.2;
+    text-transform: uppercase;
+}
+
+.academic-coursework li:nth-child(even) {
+    background: var(--section-accent-alt);
 }
 
 .sobre-card-footer {
@@ -6265,5 +6537,322 @@ body.dark-mode .header-logo {
     .section-projetos .project-number-display,
     .section-projetos .project-card.has-gallery .project-number-display {
         font-size: clamp(3.8rem, 18vw, 5rem);
+    }
+}
+
+/* ====================================
+   Acabamento responsivo — telas touch
+   ==================================== */
+@media (max-width: 768px) {
+    html {
+        scroll-padding-top: 92px;
+        overflow-x: clip;
+    }
+
+    body,
+    main,
+    section,
+    .container,
+    .section-masthead,
+    .sobre-grid,
+    .contato-wrapper,
+    .project-header-left,
+    .project-content,
+    .project-copy,
+    .tech-stack,
+    .social-info {
+        min-width: 0;
+    }
+
+    img,
+    video {
+        max-width: 100%;
+    }
+
+    .header-content {
+        max-height: calc(100dvh - 20px);
+        overflow-y: auto;
+        overscroll-behavior: contain;
+    }
+
+    .nav.active {
+        max-height: calc(100dvh - 90px);
+        overflow-y: auto;
+    }
+
+    .section-sobre,
+    .section-projetos,
+    .section-tecnologias,
+    .section-contato {
+        padding-block: clamp(4.8rem, 18vw, 6rem);
+    }
+
+    .section-masthead {
+        gap: 1.15rem;
+        margin-bottom: 2.5rem;
+        padding-bottom: 1.15rem;
+    }
+
+    .section-masthead .section-title {
+        max-width: 100%;
+        font-size: clamp(2.75rem, 13vw, 5rem);
+        line-height: 0.84;
+        overflow-wrap: anywhere;
+    }
+
+    .section-sobre .sobre-card,
+    .section-tecnologias .tech-stack,
+    .section-contato .contato-form-container,
+    .section-contato .contato-social-container {
+        padding: clamp(1rem, 4.5vw, 1.5rem);
+    }
+
+    .section-sobre .sobre-text h3 {
+        font-size: clamp(2.35rem, 12vw, 4rem);
+        overflow-wrap: anywhere;
+    }
+
+    .section-sobre .sobre-text p {
+        padding-block: 1rem;
+        font-size: 0.96rem;
+        line-height: 1.55;
+    }
+
+    .sobre-card-footer .btn {
+        width: 100%;
+    }
+
+    .academic-facts {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .academic-facts > div:nth-child(3) {
+        grid-column: 1 / -1;
+        border-top: 2px solid var(--section-panel-line);
+        border-left: 0;
+    }
+
+    .academic-program h4 {
+        max-width: none;
+        font-size: clamp(1.55rem, 7vw, 2.35rem);
+    }
+
+    .section-projetos .projetos-carousel-wrapper {
+        grid-template-columns: 44px minmax(0, 1fr) 44px;
+        gap: 0.7rem 0.45rem;
+        padding-top: 0;
+    }
+
+    .section-projetos .projetos-carousel {
+        height: clamp(560px, 78svh, 650px);
+    }
+
+    .section-projetos .project-card {
+        padding: clamp(0.9rem, 4vw, 1.15rem);
+    }
+
+    .section-projetos .project-title {
+        max-width: 100%;
+        font-size: clamp(2rem, 10vw, 3.15rem);
+        line-height: 0.88;
+        overflow-wrap: anywhere;
+    }
+
+    .section-projetos .project-content {
+        padding-right: 0.25rem;
+    }
+
+    .section-projetos .project-card:not(.has-gallery) .project-copy,
+    .section-projetos .project-card.has-gallery .project-copy {
+        grid-template-columns: minmax(0, 1fr) minmax(3.8rem, auto);
+    }
+
+    .section-projetos .project-number-display,
+    .section-projetos .project-card.has-gallery .project-number-display {
+        padding-bottom: 0.18em;
+        font-size: clamp(3.9rem, 18vw, 5.75rem);
+        line-height: 1;
+    }
+
+    .section-projetos .project-buttons .btn,
+    .section-projetos .project-nav,
+    .section-projetos .project-indicator {
+        min-height: 44px;
+    }
+
+    .section-projetos .project-nav {
+        width: 44px;
+        height: 44px;
+    }
+
+    .section-projetos .project-indicators {
+        min-width: 0;
+        gap: 0.2rem;
+    }
+
+    .section-projetos .project-indicator {
+        height: 44px;
+    }
+
+    .section-tecnologias .tech-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.6rem;
+    }
+
+    .section-tecnologias .tech-item {
+        min-width: 0;
+        min-height: 112px;
+        padding-inline: 0.5rem;
+    }
+
+    .section-tecnologias .tech-stack-title,
+    .section-contato .contato-subtitle,
+    .section-contato .social-info h4 {
+        overflow-wrap: anywhere;
+    }
+
+    .section-contato .contato-social-container {
+        min-height: 0;
+    }
+
+    .section-contato .social-card {
+        min-height: 88px;
+        padding: 0.85rem;
+        gap: 0.75rem;
+    }
+
+    .section-contato .social-card::after {
+        font-size: 1.15rem;
+    }
+
+    .section-contato .social-icon {
+        width: 46px;
+        height: 46px;
+        flex: 0 0 46px;
+    }
+
+    .section-contato .form-input,
+    .section-contato .form-textarea {
+        width: 100%;
+        font-size: 1rem;
+    }
+
+    .lightbox {
+        padding: 0.75rem;
+    }
+
+    .lightbox-content {
+        max-width: 100%;
+        max-height: calc(100dvh - 1.5rem);
+    }
+
+    .lightbox-close {
+        top: 1rem;
+        right: 1rem;
+        width: 44px;
+        height: 44px;
+    }
+}
+
+@media (max-width: 480px) {
+    .fullscreen-hero .hero-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .fullscreen-hero .hero-actions .btn {
+        width: 100%;
+        min-height: 44px;
+    }
+
+    .section-index {
+        padding: 0.6rem 0.65rem;
+    }
+
+    .academic-header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .academic-label,
+    .academic-semester {
+        width: fit-content;
+    }
+
+    .academic-facts {
+        grid-template-columns: 1fr;
+    }
+
+    .academic-facts > div + div,
+    .academic-facts > div:nth-child(3) {
+        grid-column: auto;
+        border-top: 2px solid var(--section-panel-line);
+        border-left: 0;
+    }
+
+    .academic-coursework ul {
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+
+    .section-projetos .project-buttons {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .section-projetos .project-buttons .btn:only-child {
+        grid-column: 1 / -1;
+    }
+
+    .footer .footer-grid {
+        padding-inline: 1rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .header-title {
+        display: none;
+    }
+
+    .section-sobre > .container,
+    .section-projetos > .container,
+    .section-tecnologias > .container,
+    .section-contato > .container {
+        padding-inline: 0.8rem;
+    }
+
+    .section-masthead .section-title {
+        font-size: 2.55rem;
+    }
+
+    .section-projetos .projetos-carousel-wrapper {
+        grid-template-columns: 40px minmax(0, 1fr) 40px;
+    }
+
+    .section-projetos .project-nav {
+        width: 40px;
+    }
+
+    .section-projetos .project-card {
+        padding: 0.8rem;
+    }
+
+    .section-projetos .project-title {
+        font-size: 1.9rem;
+    }
+
+    .section-projetos .project-number-display,
+    .section-projetos .project-card.has-gallery .project-number-display {
+        font-size: 3.65rem;
+    }
+
+    .section-tecnologias .tech-list {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (hover: none) {
+    .project-card:hover,
+    .section-sobre .sobre-image:hover,
+    .section-tecnologias .tech-stack:hover {
+        transform: none;
     }
 }

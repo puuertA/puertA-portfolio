@@ -107,6 +107,7 @@ function initPinnedCameraSequence() {
     const cameraWorld = section?.querySelector('.camera-world');
 
     if (!section || !cameraPin || !cameraWorld) return;
+    if (!window.gsap || !window.ScrollTrigger) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     const cameraMedia = gsap.matchMedia();
@@ -118,7 +119,6 @@ function initPinnedCameraSequence() {
         const isMobile = context.conditions.isMobile;
         const sequenceItems = gsap.utils.toArray('.camera-sequence-item', section);
         const cameraGrid = section.querySelector('.camera-grid');
-        const cameraCards = section.querySelector('.camera-cards');
         const progressFill = section.querySelector('.camera-progress-fill');
         const orbitA = section.querySelector('.camera-orbit-a');
         const orbitB = section.querySelector('.camera-orbit-b');
@@ -132,14 +132,18 @@ function initPinnedCameraSequence() {
             filter: 'blur(10px)',
             transformOrigin: 'center bottom'
         });
-        gsap.set(progressFill, { scaleY: 0, transformOrigin: 'top' });
+        gsap.set(progressFill, {
+            scaleX: isMobile ? 0 : 1,
+            scaleY: isMobile ? 1 : 0,
+            transformOrigin: isMobile ? 'left center' : 'center top'
+        });
 
         const cameraTimeline = gsap.timeline({
             defaults: { ease: 'power3.out' },
             scrollTrigger: {
                 trigger: section,
                 start: 'top top',
-                end: () => `+=${Math.round(window.innerHeight * (isMobile ? 4.2 : 3.4))}`,
+                end: () => `+=${Math.round(window.innerHeight * (isMobile ? 3.35 : 3.4))}`,
                 pin: cameraPin,
                 pinSpacing: true,
                 scrub: 1.15,
@@ -179,7 +183,7 @@ function initPinnedCameraSequence() {
                 },
                 0
             )
-            .to(progressFill, { scaleY: 1, duration: 2.8, ease: 'power3.inOut' }, 0)
+            .to(progressFill, { scaleX: 1, scaleY: 1, duration: 2.8, ease: 'power3.inOut' }, 0)
             .to(orbitA, {
                 xPercent: -65,
                 yPercent: 34,
@@ -208,16 +212,8 @@ function initPinnedCameraSequence() {
                 filter: 'blur(0px)',
                 duration: 0.8,
                 ease: 'power3.out'
-            }, 0.32 + (index * 0.2));
+            }, 0.08 + (index * 0.2));
         });
-
-        if (isMobile) {
-            cameraTimeline.to(cameraCards, {
-                xPercent: -66.666,
-                duration: 1.85,
-                ease: 'power3.out'
-            }, 0.95);
-        }
 
         cameraTimeline.to(cameraWorld, {
             scale: isMobile ? 0.97 : 0.94,
