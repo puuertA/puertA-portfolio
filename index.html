@@ -5,13 +5,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lucas - Desenvolvedor Full Stack</title>
+    <meta name="description"
+        content="Portfólio de Lucas Cano (@puertA): desenvolvimento full stack, segurança, interfaces e automação.">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="pt_BR">
+    <meta property="og:title" content="Lucas Cano — Seguro no código. Brutal no visual.">
+    <meta property="og:description" content="Sites, aplicações web, APIs, segurança e automações.">
+    <meta property="og:image" content="https://portfolio-lucaspuerta.netlify.app/resources/og.png">
+    <meta property="og:image:width" content="1731">
+    <meta property="og:image:height" content="909">
+    <meta property="og:image:alt" content="Seguro no código. Brutal no visual. — Lucas Cano, @puertA">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Lucas Cano — Seguro no código. Brutal no visual.">
+    <meta name="twitter:description" content="Sites, aplicações web, APIs, segurança e automações.">
+    <meta name="twitter:image" content="https://portfolio-lucaspuerta.netlify.app/resources/og.png">
     <link rel="icon" type="image/x-icon" href="resources/favicons/favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="resources/favicons/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="resources/favicons/favicon-16x16.png">
     <link rel="apple-touch-icon" sizes="180x180" href="resources/favicons/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="192x192" href="resources/favicons/android-chrome-192x192.png">
     <link rel="icon" type="image/png" sizes="512x512" href="resources/favicons/android-chrome-512x512.png">
-    <link rel="stylesheet" href="styles.css?v=2">
+    <link rel="stylesheet" href="styles.css?v=15">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
@@ -56,7 +70,7 @@
     <header class="header">
         <div class="container">
             <div class="header-content">
-                <div class="header-text">
+                <a class="header-text" href="#inicio" aria-label="Ir para o início">
                     <div class="header-title-wrapper">
                         <img src="resources/logopuerta.png" alt="Logo" class="header-logo">
                         <h1 class="header-title">
@@ -64,7 +78,7 @@
                         </h1>
                     </div>
                     <p class="header-subtitle">Desenvolvedor Full Stack</p>
-                </div>
+                </a>
                 <nav class="nav" id="nav">
                     <a href="#sobre" class="nav-link">Sobre</a>
                     <a href="#projetos" class="nav-link">Projetos</a>
@@ -73,10 +87,10 @@
                     <a href="https://github.com/puuertA" target="_blank" class="nav-link nav-link-highlight">GitHub</a>
                 </nav>
                 <button class="theme-toggle" id="themeToggle" aria-label="Alternar tema">
-                    <span class="theme-icon sun">☀️</span>
-                    <span class="theme-icon moon">🌙</span>
+                    <span class="theme-icon sun" aria-hidden="true">☼</span>
+                    <span class="theme-icon moon" aria-hidden="true">◐</span>
                 </button>
-                <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+                <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu" aria-controls="nav" aria-expanded="false">
                     <span></span>
                     <span></span>
                     <span></span>
@@ -85,24 +99,105 @@
         </div>
     </header>
 
-    <!-- Seção de Boas-vindas com Animação -->
-    <section class="section section-welcome">
-        <div class="container">
-            <div class="welcome-content">
-                <span class="wave-emoji">👋</span>
-                <h2 class="wave-text">
-                    <span class="wave-letter">O</span><span class="wave-letter">l</span><span
-                        class="wave-letter">á</span><span class="wave-letter">,</span>
-                    <span class="wave-space"> </span>
-                    <span class="wave-letter">s</span><span class="wave-letter">e</span><span
-                        class="wave-letter">j</span><span class="wave-letter">a</span>
-                    <span class="wave-space"> </span>
-                    <span class="wave-letter">b</span><span class="wave-letter">e</span><span
-                        class="wave-letter">m</span><span class="wave-letter">-</span><span
-                        class="wave-letter">v</span><span class="wave-letter">i</span><span
-                        class="wave-letter">n</span><span class="wave-letter">d</span><span
-                        class="wave-letter">o</span><span class="wave-letter">!</span>
-                </h2>
+    <!-- Hero fullscreen. Vídeo: Airraft / Pexels (ID 10130349), uso gratuito. -->
+    <section class="section section-welcome section-hero fullscreen-hero" id="inicio"
+        data-inspira-component="hero-reveal">
+        <video class="hero-video" autoplay muted loop playsinline webkit-playsinline preload="auto" aria-hidden="true" tabindex="-1">
+            <source src="resources/hero-code.mp4?v=1" type="video/mp4">
+        </video>
+        <div class="hero-video-wash" aria-hidden="true"></div>
+        <div class="hero-noise" aria-hidden="true"></div>
+
+        <div class="container hero-stage">
+            <div class="hero-prelude" aria-hidden="true">
+                <span class="hero-prelude-index">01 / PORTFÓLIO</span>
+                <span class="hero-tension-track"><span class="hero-tension-bar"></span></span>
+                <span class="hero-prelude-status">CARREGANDO</span>
+            </div>
+
+            <div class="hero-meta">
+                <span>Lucas Cano — Full Stack Developer</span>
+                <span>Web / APIs / Segurança</span>
+            </div>
+
+            <h2 class="hero-title" aria-label="Seguro no código. Brutal no visual.">
+                <span class="hero-reveal-line">
+                    <span class="hero-reveal-inner">Seguro no código.</span>
+                </span>
+                <span class="hero-reveal-line hero-title-accent">
+                    <span class="hero-reveal-inner">Brutal no visual.</span>
+                </span>
+            </h2>
+
+            <div class="hero-bottom">
+                <p class="hero-description">
+                    Sou o <span class="brand-accent">@puertA</span>. Desenvolvo aplicações web, APIs e automações.
+                </p>
+                <div class="hero-actions">
+                    <a href="#projetos" class="btn btn-primary">Ver projetos <span aria-hidden="true">↘</span></a>
+                    <a href="#contato" class="btn btn-outline">Falar comigo</a>
+                </div>
+            </div>
+        </div>
+
+        <a class="hero-scroll-indicator" href="#processo" aria-label="Rolar para a seção Processo">
+            <span class="hero-scroll-label">Continuar</span>
+            <span class="hero-scroll-line" aria-hidden="true"></span>
+            <span class="hero-scroll-arrow" aria-hidden="true">↓</span>
+        </a>
+        <span class="hero-corner hero-corner-left" aria-hidden="true">PORTFÓLIO / 2026</span>
+        <span class="hero-corner hero-corner-right" aria-hidden="true">SÃO PAULO · BR</span>
+    </section>
+
+    <!-- Processo com pin scroll -->
+    <section class="section section-camera" id="processo" aria-labelledby="cameraTitle">
+        <div class="camera-pin">
+            <div class="camera-grid" aria-hidden="true"></div>
+            <div class="camera-frame" aria-hidden="true">
+                <span class="camera-frame-corner camera-frame-tl"></span>
+                <span class="camera-frame-corner camera-frame-tr"></span>
+                <span class="camera-frame-corner camera-frame-bl"></span>
+                <span class="camera-frame-corner camera-frame-br"></span>
+            </div>
+            <span class="camera-orbit camera-orbit-a" aria-hidden="true"></span>
+            <span class="camera-orbit camera-orbit-b" aria-hidden="true"></span>
+
+            <div class="container camera-world">
+                <div class="camera-topbar camera-sequence-item">
+                    <span>02 / COMO EU TRABALHO</span>
+                </div>
+
+                <div class="camera-copy">
+                    <p class="camera-kicker camera-sequence-item">DO COMEÇO AO DEPLOY</p>
+                    <h2 class="camera-title" id="cameraTitle">
+                        <span class="camera-title-line camera-sequence-item">Pensar primeiro.</span>
+                        <span class="camera-title-line camera-title-accent camera-sequence-item">Codar depois.</span>
+                    </h2>
+                </div>
+
+                <div class="camera-cards">
+                    <article class="camera-card camera-card-one camera-sequence-item">
+                        <span class="camera-card-index">01</span>
+                        <h3>Entender o problema</h3>
+                        <p>O que precisa funcionar, para quem e por quê.</p>
+                    </article>
+                    <article class="camera-card camera-card-two camera-sequence-item">
+                        <span class="camera-card-index">02</span>
+                        <h3>Fazer funcionar</h3>
+                        <p>Front-end, back-end e banco sem complicar o que é simples.</p>
+                    </article>
+                    <article class="camera-card camera-card-three camera-sequence-item">
+                        <span class="camera-card-index">03</span>
+                        <h3>Testar e entregar</h3>
+                        <p>Reviso, corrijo e deixo pronto para uso.</p>
+                    </article>
+                </div>
+            </div>
+
+            <div class="camera-progress" aria-hidden="true">
+                <span class="camera-progress-label">ETAPAS</span>
+                <span class="camera-progress-track"><span class="camera-progress-fill"></span></span>
+                <span class="camera-progress-time">01—03</span>
             </div>
         </div>
     </section>
@@ -110,6 +205,12 @@
     <!-- Seção Sobre -->
     <section class="section section-sobre" id="sobre">
         <div class="container">
+            <header class="section-masthead">
+                <span class="section-index">03 / SOBRE</span>
+                <h2 class="section-title">Quem faz</h2>
+                <span class="section-note">SÃO PAULO · BR</span>
+            </header>
+
             <div class="sobre-grid">
                 <div class="sobre-image-wrapper">
                     <div class="sobre-image">
@@ -117,28 +218,34 @@
                     </div>
                 </div>
                 <div class="sobre-content">
-                    <h2 class="section-title">Sobre Mim</h2>
                     <div class="sobre-card">
                         <div class="sobre-text">
-                            <h3 style="font-size: 1.8rem;">Lucas Cano <span
-                                    style="color: #FF00FF; font-weight: 900; font-style: italic; text-transform: none;">@puertA</span>
-                            </h3>
+                            <span class="sobre-eyebrow">FULL STACK / SEGURANÇA / AUTOMAÇÃO</span>
+                            <h3>Lucas Cano <span>@puertA</span></h3>
                             <p>
                                 Desenvolvedor full stack focado em segurança de software, automação e design de
                                 interfaces.
                                 Cursando Bacharelado em Ciência da Computação, trabalho com aplicações web, APIs e
                                 ferramentas CLI utilizando JavaScript, TypeScript, Python, Node.js e React.
-
+                            </p>
+                            <p>
                                 Também atuo na criação de interfaces modernas e identidades visuais para projetos
                                 digitais,
                                 unindo funcionalidade, estética e usabilidade.
-
+                            </p>
+                            <p>
                                 Atualmente desenvolvo o BasiliskScan, uma ferramenta para detecção de dependências
                                 vulneráveis em sistemas web, como parte do meu TCC.
-
                             </p>
                         </div>
-                        <a href="resources/CV Lucas Puerta.pdf" download class="btn btn-primary">Baixar CV</a>
+                        <div class="sobre-card-footer">
+                            <div class="sobre-tags" aria-label="Áreas de atuação">
+                                <span>WEB</span>
+                                <span>APIs</span>
+                                <span>SECURITY</span>
+                            </div>
+                            <a href="resources/CV Lucas Puerta.pdf" download class="btn btn-primary">Baixar CV</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -148,7 +255,12 @@
     <!-- Seção Projetos -->
     <section class="section section-projetos" id="projetos">
         <div class="container">
-            <h2 class="section-title">Projetos em Destaque</h2>
+            <header class="section-masthead">
+                <span class="section-index">04 / PROJETOS</span>
+                <h2 class="section-title">Trabalhos</h2>
+                <span class="section-note">SELEÇÃO / 06</span>
+            </header>
+
             <div class="projetos-carousel-wrapper">
                 <button class="project-nav project-prev" onclick="changeProject(-1)"
                     aria-label="Projeto anterior">‹</button>
@@ -167,7 +279,12 @@
     <!-- Seção Tecnologias -->
     <section class="section section-tecnologias" id="tecnologias">
         <div class="container">
-            <h2 class="section-title">Tecnologias & Habilidades</h2>
+            <header class="section-masthead">
+                <span class="section-index">05 / STACK</span>
+                <h2 class="section-title">Ferramentas</h2>
+                <span class="section-note">USO NO DIA A DIA</span>
+            </header>
+
             <div id="techStacksContainer">
                 <!-- Tech stacks serão carregados dinamicamente aqui -->
             </div>
@@ -177,20 +294,24 @@
     <!-- Seção Contato -->
     <section class="section section-contato" id="contato">
         <div class="container">
-            <h2 class="section-title">Vamos Conversar?</h2>
+            <header class="section-masthead">
+                <span class="section-index">06 / CONTATO</span>
+                <h2 class="section-title">Fale comigo</h2>
+                <span class="section-note">SÃO PAULO · BR</span>
+            </header>
 
             <div class="contato-wrapper">
 
                 <!-- Formulário de Contato -->
                 <div class="contato-form-container">
-                    <h3 class="contato-subtitle">📧 Me envie uma mensagem</h3>
+                    <h3 class="contato-subtitle">Mande uma mensagem</h3>
                     <form class="contato-form" id="contactForm" action="https://formsubmit.co/lucaspuerta1@hotmail.com"
                         method="POST">
                         <!-- Campos ocultos para configuração do FormSubmit -->
                         <input type="hidden" name="_subject" value="Nova mensagem do portfólio!">
                         <input type="hidden" name="_captcha" value="false">
                         <input type="hidden" name="_template" value="table">
-                        <input type="hidden" name="_next" value="portfolio-lucaspuerta.netlify.app/index.html#contato">
+                        <input type="hidden" name="_next" value="https://portfolio-lucaspuerta.netlify.app/index.html#contato">
                         <input type="text" name="_honey" style="display:none">
 
                         <div class="form-group">
@@ -217,14 +338,14 @@
                         </div>
 
                         <button type="submit" class="btn btn-primary btn-large btn-block">
-                            Enviar Mensagem
+                            Enviar mensagem
                         </button>
                     </form>
                 </div>
 
                 <!-- Redes Sociais -->
                 <div class="contato-social-container">
-                    <h3 class="contato-subtitle">🔗 Conecte-se comigo</h3>
+                    <h3 class="contato-subtitle">Outros canais</h3>
 
                     <div class="social-links">
                         <a href="https://github.com/puuertA/" target="_blank" class="social-card">
@@ -250,7 +371,7 @@
 
                     <a href="https://www.linkedin.com/messaging/compose/?recipient=lucas-cano-puerta&subject=Olá%20Lucas!&body=Olá%20Lucas,%20visitei%20seu%20portfólio%20e%20gostaria%20de%20conversar%20sobre%20oportunidades%20de%20colaboração."
                         target="_blank" class="btn btn-primary btn-large btn-linkedin">
-                        💼 Me chamar no LinkedIn
+                        Falar no LinkedIn
                     </a>
                 </div>
 
@@ -260,8 +381,13 @@
 
     <!-- Footer -->
     <footer class="footer">
-        <div class="container">
-            <p>&copy; 2025 puertA. Desenvolvido com ☕ e código.</p>
+        <div class="container footer-grid">
+            <a class="footer-brand" href="#inicio" aria-label="Voltar ao início">@puertA</a>
+            <p>Lucas Cano Puerta · Full Stack Developer</p>
+            <div class="footer-meta">
+                <span>&copy; <span data-footer-year>2026</span></span>
+                <a href="#inicio">Voltar ao topo ↑</a>
+            </div>
         </div>
     </footer>
 
@@ -274,7 +400,10 @@
         <img id="lightboxImage" class="lightbox-content" src="" alt="">
     </div>
 
-    <script src="script.js"></script>
+    <script src="https://unpkg.com/lenis@1.3.8/dist/lenis.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="script.js?v=15"></script>
 </body>
 
 </html>

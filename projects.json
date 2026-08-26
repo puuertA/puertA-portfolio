@@ -3,44 +3,22 @@
     {
       "id": "basiliskscan",
       "title": "BasiliskScan",
-      "status": "in-development",
-      "description": "Ferramenta de análise de vulnerabilidades e scanning de segurança. Identifica falhas em aplicações e infraestrutura.",
+      "status": "finished",
+      "description": "BasiliskScan é uma ferramenta CLI desenvolvida como projeto de TCC para identificar componentes vulneráveis e desatualizados em projetos de software. A aplicação analisa dependências de ecossistemas como Node.js, Ionic/TypeScript, Java e PHP, correlacionando-as com fontes como NVD, OSV e Sonatype Guide. Também oferece análise offline e geração de relatórios HTML para facilitar a identificação e correção de vulnerabilidades.",
       "tags": [
         { "name": "Python", "class": "tag-python" },
-        { "name": "Security", "class": "tag-security" },
-        { "name": "CLI", "class": "tag-cli" }
+        { "name": "Cybersecurity", "class": "tag-security" },
+        { "name": "SCA", "class": "tag-sca" },
+        { "name": "CLI", "class": "tag-cli" },
+        { "name": "OWASP", "class": "tag-owasp" },
+        { "name": "NVD", "class": "tag-nvd" },
+        { "name": "OSV", "class": "tag-osv" }
       ],
       "buttons": [
         {
           "text": "Ver Repositório",
           "url": "https://github.com/puuertA/BasiliskScan",
           "class": "btn-secondary",
-          "target": "_blank"
-        }
-      ],
-      "images": []
-    },
-    {
-      "id": "anomtalk",
-      "title": "AnomTalk",
-      "status": "finished",
-      "description": "Plataforma de chat anônimo em tempo real com salas temporárias. Sem cadastros, login ou dados pessoais - apenas entre e comece a conversar! Mensagens instantâneas via WebSocket.",
-      "tags": [
-        { "name": "Next.js", "class": "tag-react" },
-        { "name": "TypeScript", "class": "tag-typescript" },
-        { "name": "Socket.io", "class": "tag-node" }
-      ],
-      "buttons": [
-        {
-          "text": "Ver Repositório",
-          "url": "https://github.com/puuertA/anomtalk",
-          "class": "btn-secondary",
-          "target": "_blank"
-        },
-        {
-          "text": "Live Demo",
-          "url": "https://anomtalk.netlify.app/",
-          "class": "btn-outline",
           "target": "_blank"
         }
       ],
@@ -72,6 +50,95 @@
           "alt": "SGN Features"
         }
       ]
+    },
+    {
+      "id": "tibia-premium-farm-calculator",
+      "title": "Tibia Premium Farm Calculator",
+      "status": "finished",
+      "description": "Aplicação full stack para ajudar jogadores de Tibia a calcular e acompanhar o progresso necessário para adquirir Premium Time utilizando recursos obtidos dentro do jogo. Possui autenticação, histórico de registros, dashboard com gráficos e gerenciamento de dados, utilizando React, Node.js, Express, Prisma e SQLite.",
+      "tags": [
+        { "name": "React", "class": "tag-react" },
+        { "name": "TypeScript", "class": "tag-typescript" },
+        { "name": "Node.js", "class": "tag-nodejs" },
+        { "name": "Express", "class": "tag-express" },
+        { "name": "Prisma", "class": "tag-prisma" },
+        { "name": "SQLite", "class": "tag-sqlite" },
+        { "name": "JWT", "class": "tag-jwt" },
+        { "name": "REST API", "class": "tag-api" },
+        { "name": "Full Stack", "class": "tag-fullstack" }
+      ],
+      "buttons": [
+        {
+          "text": "Ver Repositório",
+          "url": "https://github.com/puuertA/tibia-premium-farm-calculator",
+          "class": "btn-secondary",
+          "target": "_blank"
+        },
+        {
+          "text": "Live Demo",
+          "url": "https://tibia-premiumfarm-calculator.netlify.app",
+          "class": "btn-outline",
+          "target": "_blank"
+        }
+      ],
+      "images": []
+    },
+    {
+      "id": "puertas-tibia-map-visualizer",
+      "title": "Tibia Map Visualizer",
+      "status": "finished",
+      "description": "Aplicação web para visualizar, explorar e manipular mapas do Tibia a partir de arquivos locais do jogo. O projeto utiliza React e Leaflet para navegação pelo mapa, além de processamento de imagens, geração de tiles e exportação de conteúdo por meio de um backend em Node.js e Express.",
+      "tags": [
+        { "name": "React", "class": "tag-react" },
+        { "name": "TypeScript", "class": "tag-typescript" },
+        { "name": "Node.js", "class": "tag-nodejs" },
+        { "name": "Express", "class": "tag-express" },
+        { "name": "Leaflet", "class": "tag-leaflet" },
+        { "name": "Fabric.js", "class": "tag-fabric" },
+        { "name": "Sharp", "class": "tag-sharp" },
+        { "name": "REST API", "class": "tag-api" }
+      ],
+      "buttons": [
+        {
+          "text": "Ver Repositório",
+          "url": "https://github.com/puuertA/puertas-tibia-map-visualizer",
+          "class": "btn-secondary",
+          "target": "_blank"
+        },
+        {
+          "text": "Live Demo",
+          "url": "https://puertas-tibia-map-visualizer.netlify.app",
+          "class": "btn-outline",
+          "target": "_blank"
+        }
+      ],
+      "images": []
+    },
+    {
+      "id": "anomtalk",
+      "title": "AnomTalk",
+      "status": "finished",
+      "description": "Plataforma de chat anônimo em tempo real com salas temporárias. Sem cadastros, login ou dados pessoais - apenas entre e comece a conversar! Mensagens instantâneas via WebSocket.",
+      "tags": [
+        { "name": "Next.js", "class": "tag-react" },
+        { "name": "TypeScript", "class": "tag-typescript" },
+        { "name": "Socket.io", "class": "tag-node" }
+      ],
+      "buttons": [
+        {
+          "text": "Ver Repositório",
+          "url": "https://github.com/puuertA/anomtalk",
+          "class": "btn-secondary",
+          "target": "_blank"
+        },
+        {
+          "text": "Live Demo",
+          "url": "https://anomtalk.netlify.app/",
+          "class": "btn-outline",
+          "target": "_blank"
+        }
+      ],
+      "images": []
     },
     {
       "id": "hormatech",

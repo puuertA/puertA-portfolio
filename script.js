@@ -1,8 +1,505 @@
 // ====================================
+// Motion Layer - Lenis + GSAP
+// ====================================
+let lenis = null;
+let portfolioDataReady = false;
+let loadingFinished = false;
+let motionStarted = false;
+
+function initLenis() {
+    if (!window.Lenis || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    lenis = new Lenis({
+        duration: 1.35,
+        easing: (t) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t)),
+        smoothWheel: true,
+        wheelMultiplier: 0.82,
+        touchMultiplier: 1.2
+    });
+
+    function raf(time) {
+        lenis.raf(time);
+        requestAnimationFrame(raf);
+    }
+
+    requestAnimationFrame(raf);
+}
+
+function animatePageIntro() {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (!window.gsap) {
+        document.body.classList.add('hero-intro-complete');
+        return;
+    }
+
+    document.body.classList.add('gsap-ready');
+
+    if (prefersReducedMotion) {
+        document.body.classList.add('hero-intro-complete');
+        return;
+    }
+
+    gsap.set('.hero-reveal-inner', { yPercent: 118, rotate: 2.5 });
+    gsap.set('.hero-meta, .hero-description, .hero-actions .btn, .hero-scroll-indicator, .hero-corner', {
+        autoAlpha: 0
+    });
+    gsap.set('.hero-tension-bar', { scaleX: 0, transformOrigin: 'left center' });
+    gsap.set('.hero-prelude', { autoAlpha: 0 });
+    gsap.set('.hero-video', { autoAlpha: 0, scale: 1.12 });
+
+    const heroTimeline = gsap.timeline({
+        defaults: { ease: 'power3.out' },
+        onComplete: () => {
+            document.body.classList.add('hero-intro-complete');
+            if (window.scrollY > 24) {
+                gsap.set('.hero-scroll-indicator', { autoAlpha: 0, y: 20 });
+            }
+        }
+    });
+
+    heroTimeline
+        .from('.header', { y: -90, autoAlpha: 0, duration: 0.65 }, 0)
+        .to('.hero-video', { autoAlpha: 1, scale: 1.045, duration: 1.7, ease: 'power3.out' }, 0)
+        .to('.hero-prelude', { autoAlpha: 1, duration: 0.65 }, 0.16)
+        .from('.hero-prelude-index, .hero-prelude-status', {
+            y: 12,
+            autoAlpha: 0,
+            stagger: 0.08,
+            duration: 0.7,
+            ease: 'expo.out'
+        }, 0.2)
+        .to('.hero-tension-bar', { scaleX: 1, duration: 0.88, ease: 'power3.in' }, 0.26)
+        .to('.hero-prelude-status', { letterSpacing: '0.22em', duration: 0.72, ease: 'power3.in' }, 0.38)
+        .to('.hero-tension-bar', {
+            scaleX: 0,
+            transformOrigin: 'right center',
+            duration: 0.6,
+            ease: 'expo.in'
+        }, 1.14)
+        .to('.hero-prelude', { autoAlpha: 0, y: -10, duration: 0.65, ease: 'expo.in' }, 1.24)
+        .from('.hero-meta span', { y: 18, autoAlpha: 0, stagger: 0.08, duration: 0.68 }, 1.25)
+        .to('.hero-meta', { autoAlpha: 1, duration: 0.65 }, 1.25)
+        .to('.hero-reveal-inner', {
+            yPercent: 0,
+            rotate: 0,
+            duration: 0.92,
+            stagger: 0.13,
+            ease: 'expo.out'
+        }, 1.37)
+        .from('.hero-title-accent', {
+            clipPath: 'inset(0 100% 0 0)',
+            duration: 0.72,
+            ease: 'expo.inOut'
+        }, 1.62)
+        .to('.hero-description', { autoAlpha: 1, duration: 0.65 }, 1.82)
+        .from('.hero-description', { y: 28, duration: 0.72 }, 1.82)
+        .to('.hero-actions .btn', { autoAlpha: 1, duration: 0.65, stagger: 0.04 }, 1.92)
+        .from('.hero-actions .btn', { y: 24, stagger: 0.08, duration: 0.72 }, 1.92)
+        .to('.hero-corner', { autoAlpha: 1, stagger: 0.08, duration: 0.65 }, 2.08)
+        .to('.hero-scroll-indicator', { autoAlpha: 1, duration: 0.7 }, 2.2)
+        .from('.hero-scroll-line', { scaleY: 0, transformOrigin: 'top', duration: 0.7 }, 2.18);
+}
+
+function initPinnedCameraSequence() {
+    const section = document.querySelector('.section-camera');
+    const cameraPin = section?.querySelector('.camera-pin');
+    const cameraWorld = section?.querySelector('.camera-world');
+
+    if (!section || !cameraPin || !cameraWorld) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const cameraMedia = gsap.matchMedia();
+
+    cameraMedia.add({
+        isMobile: '(max-width: 768px)',
+        isDesktop: '(min-width: 769px)'
+    }, (context) => {
+        const isMobile = context.conditions.isMobile;
+        const sequenceItems = gsap.utils.toArray('.camera-sequence-item', section);
+        const cameraGrid = section.querySelector('.camera-grid');
+        const cameraCards = section.querySelector('.camera-cards');
+        const progressFill = section.querySelector('.camera-progress-fill');
+        const orbitA = section.querySelector('.camera-orbit-a');
+        const orbitB = section.querySelector('.camera-orbit-b');
+
+        gsap.set(sequenceItems, {
+            autoAlpha: 0,
+            y: isMobile ? 72 : 110,
+            z: -90,
+            scale: 0.9,
+            rotateX: 9,
+            filter: 'blur(10px)',
+            transformOrigin: 'center bottom'
+        });
+        gsap.set(progressFill, { scaleY: 0, transformOrigin: 'top' });
+
+        const cameraTimeline = gsap.timeline({
+            defaults: { ease: 'power3.out' },
+            scrollTrigger: {
+                trigger: section,
+                start: 'top top',
+                end: () => `+=${Math.round(window.innerHeight * (isMobile ? 4.2 : 3.4))}`,
+                pin: cameraPin,
+                pinSpacing: true,
+                scrub: 1.15,
+                anticipatePin: 1,
+                invalidateOnRefresh: true
+            }
+        });
+
+        cameraTimeline
+            .fromTo(cameraWorld,
+                {
+                    scale: isMobile ? 1.14 : 1.22,
+                    xPercent: isMobile ? 5 : 8,
+                    yPercent: 7,
+                    rotateZ: -1.2,
+                    transformPerspective: 1200
+                },
+                {
+                    scale: 1,
+                    xPercent: 0,
+                    yPercent: 0,
+                    rotateZ: 0,
+                    duration: 1.35,
+                    ease: 'power3.out'
+                },
+                0
+            )
+            .fromTo(cameraGrid,
+                { scale: 1.18, xPercent: -4, yPercent: -3 },
+                {
+                    scale: 1.02,
+                    xPercent: 2,
+                    yPercent: 2,
+                    backgroundPosition: '108px 54px',
+                    duration: 2.8,
+                    ease: 'power3.out'
+                },
+                0
+            )
+            .to(progressFill, { scaleY: 1, duration: 2.8, ease: 'power3.inOut' }, 0)
+            .to(orbitA, {
+                xPercent: -65,
+                yPercent: 34,
+                rotate: 75,
+                scale: 0.82,
+                duration: 2.5,
+                ease: 'power3.out'
+            }, 0.15)
+            .to(orbitB, {
+                xPercent: 78,
+                yPercent: -52,
+                rotate: -45,
+                scale: 1.16,
+                duration: 2.5,
+                ease: 'power3.out'
+            }, 0.15);
+
+        // Cada entrada começa exatamente 0.2s depois da anterior.
+        sequenceItems.forEach((item, index) => {
+            cameraTimeline.to(item, {
+                autoAlpha: 1,
+                y: 0,
+                z: 0,
+                scale: 1,
+                rotateX: 0,
+                filter: 'blur(0px)',
+                duration: 0.8,
+                ease: 'power3.out'
+            }, 0.32 + (index * 0.2));
+        });
+
+        if (isMobile) {
+            cameraTimeline.to(cameraCards, {
+                xPercent: -66.666,
+                duration: 1.85,
+                ease: 'power3.out'
+            }, 0.95);
+        }
+
+        cameraTimeline.to(cameraWorld, {
+            scale: isMobile ? 0.97 : 0.94,
+            xPercent: isMobile ? -2 : -3,
+            yPercent: -4,
+            duration: 1.05,
+            ease: 'power3.out'
+        }, 1.78);
+
+        return () => cameraTimeline.scrollTrigger?.kill();
+    });
+}
+
+function initScrollAnimations() {
+    if (!window.gsap || !window.ScrollTrigger) return;
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    if (lenis) {
+        lenis.on('scroll', ScrollTrigger.update);
+    }
+
+    ScrollTrigger.create({
+        trigger: '.section-hero',
+        start: 'top top-=24',
+        end: 'bottom top',
+        onEnter: () => {
+            gsap.to('.hero-scroll-indicator', {
+                autoAlpha: 0,
+                y: 20,
+                duration: 0.65,
+                ease: 'expo.out',
+                overwrite: true
+            });
+        },
+        onLeaveBack: () => {
+            if (!document.body.classList.contains('hero-intro-complete')) return;
+            gsap.to('.hero-scroll-indicator', {
+                autoAlpha: 1,
+                y: 0,
+                duration: 0.7,
+                ease: 'expo.out',
+                overwrite: true
+            });
+        }
+    });
+
+    const heroExit = gsap.timeline({
+        scrollTrigger: {
+            trigger: '.section-hero',
+            start: 'top top',
+            end: 'bottom top',
+            scrub: 0.8,
+            invalidateOnRefresh: true
+        }
+    });
+
+    heroExit
+        .to('.hero-stage', {
+            yPercent: -8,
+            autoAlpha: 0.18,
+            duration: 1.1,
+            ease: 'power3.inOut',
+        }, 0)
+        .to('.hero-video', {
+            yPercent: 9,
+            scale: 1.14,
+            duration: 1.1,
+            ease: 'power3.inOut'
+        }, 0);
+
+    initPinnedCameraSequence();
+
+    gsap.utils.toArray('.section-title').forEach((title) => {
+        gsap.fromTo(title,
+            { x: -36, opacity: 0 },
+            {
+                x: 0,
+                opacity: 1,
+                duration: 0.75,
+                ease: 'power3.out',
+                scrollTrigger: {
+                    trigger: title,
+                    start: 'top 85%',
+                    end: 'bottom 15%',
+                    toggleActions: 'play reverse play reverse'
+                }
+            }
+        );
+    });
+
+    gsap.fromTo('.sobre-image',
+        { y: 70, rotate: -4, opacity: 0 },
+        {
+            y: 0,
+            rotate: 0,
+            opacity: 1,
+            duration: 0.85,
+            ease: 'power3.out',
+            scrollTrigger: {
+                trigger: '.section-sobre',
+                start: 'top 70%',
+                end: 'bottom 15%',
+                toggleActions: 'play reverse play reverse'
+            }
+        }
+    );
+
+    gsap.utils.toArray('.sobre-card, .tech-stack, .contato-form-container, .contato-social-container').forEach((el, index) => {
+        gsap.fromTo(el,
+            { y: 50, opacity: 0, rotate: index % 2 ? 1.5 : -1.5 },
+            {
+                y: 0,
+                opacity: 1,
+                rotate: 0,
+                duration: 0.7,
+                ease: 'power3.out',
+                scrollTrigger: {
+                    trigger: el,
+                    start: 'top 82%',
+                    end: 'bottom 12%',
+                    toggleActions: 'play reverse play reverse'
+                }
+            }
+        );
+    });
+
+    gsap.utils.toArray('.tech-list').forEach((list) => {
+        gsap.fromTo(list.querySelectorAll('.tech-item'),
+            { y: 28, scale: 0.82, opacity: 0, rotate: -4 },
+            {
+                y: 0,
+                scale: 1,
+                opacity: 1,
+                rotate: 0,
+                duration: 0.7,
+                stagger: 0.045,
+                ease: 'expo.out',
+                scrollTrigger: {
+                    trigger: list,
+                    start: 'top 86%',
+                    end: 'bottom 10%',
+                    toggleActions: 'play reverse play reverse'
+                }
+            }
+        );
+    });
+
+    gsap.utils.toArray('.project-card.active').forEach((card) => {
+        gsap.fromTo(card,
+            { scale: 0.92, opacity: 0 },
+            {
+                scale: 1,
+                opacity: 1,
+                duration: 0.75,
+                ease: 'expo.out',
+                scrollTrigger: {
+                    trigger: '.section-projetos',
+                    start: 'top 70%',
+                    end: 'bottom 15%',
+                    toggleActions: 'play reverse play reverse'
+                }
+            }
+        );
+    });
+
+    gsap.utils.toArray('.social-card, .form-group, .project-tags .tag, .project-buttons .btn').forEach((el, index) => {
+        gsap.fromTo(el,
+            { y: 24, opacity: 0, rotate: index % 2 ? 1.5 : -1.5 },
+            {
+                y: 0,
+                opacity: 1,
+                rotate: 0,
+                duration: 0.7,
+                ease: 'power3.out',
+                scrollTrigger: {
+                    trigger: el,
+                    start: 'top 88%',
+                    end: 'bottom 8%',
+                    toggleActions: 'play reverse play reverse'
+                }
+            }
+        );
+    });
+
+    ScrollTrigger.refresh();
+}
+
+function animateActiveProject(card) {
+    if (!window.gsap || !card) return;
+
+    gsap.fromTo(card,
+        { x: 34, rotate: 1.5, opacity: 0, scale: 0.96 },
+        { x: 0, rotate: 0, opacity: 1, scale: 1, duration: 0.72, ease: 'expo.out' }
+    );
+}
+
+function startMotionWhenReady() {
+    if (motionStarted || !portfolioDataReady || !loadingFinished) return;
+
+    motionStarted = true;
+    animatePageIntro();
+    initScrollAnimations();
+}
+
+function initHeroVideoPlayback() {
+    const heroVideo = document.querySelector('.hero-video');
+    if (!heroVideo) return;
+
+    // Alguns navegadores só liberam autoplay quando as propriedades também
+    // são definidas em JavaScript antes da primeira tentativa de reprodução.
+    heroVideo.muted = true;
+    heroVideo.defaultMuted = true;
+    heroVideo.loop = true;
+    heroVideo.playsInline = true;
+    heroVideo.setAttribute('muted', '');
+    heroVideo.setAttribute('playsinline', '');
+    heroVideo.setAttribute('webkit-playsinline', '');
+
+    const markPlaying = () => {
+        document.body.classList.add('hero-video-playing');
+        document.body.classList.remove('hero-video-paused', 'hero-video-error');
+    };
+
+    const requestPlayback = () => {
+        let playAttempt;
+
+        try {
+            playAttempt = heroVideo.play();
+        } catch {
+            document.body.classList.add('hero-video-error');
+            return;
+        }
+
+        if (!playAttempt) return;
+
+        playAttempt
+            .then(markPlaying)
+            .catch(() => document.body.classList.add('hero-video-paused'));
+    };
+
+    heroVideo.addEventListener('playing', markPlaying);
+    heroVideo.addEventListener('canplay', requestPlayback, { once: true });
+    heroVideo.addEventListener('error', () => {
+        document.body.classList.add('hero-video-error');
+        document.body.classList.remove('hero-video-playing');
+    });
+
+    // Reexecuta após voltar para a aba e após a primeira interação, cobrindo
+    // Safari/iOS, economia de energia e políticas de autoplay mais restritas.
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden && heroVideo.paused) requestPlayback();
+    });
+    window.addEventListener('pageshow', requestPlayback);
+    document.addEventListener('pointerdown', requestPlayback, { once: true, passive: true });
+    document.addEventListener('touchstart', requestPlayback, { once: true, passive: true });
+    document.addEventListener('keydown', requestPlayback, { once: true });
+
+    requestPlayback();
+}
+
+initHeroVideoPlayback();
+
+// ====================================
 // Loading Screen
 // ====================================
+initLenis();
 window.addEventListener('load', () => {
     const loadingScreen = document.getElementById('loadingScreen');
+
+    if (!loadingScreen) {
+        loadingFinished = true;
+        startMotionWhenReady();
+        return;
+    }
+
+    if (sessionStorage.getItem('portfolioLoaded') === 'true') {
+        loadingScreen.remove();
+        loadingFinished = true;
+        startMotionWhenReady();
+        return;
+    }
     
     // Esconder loading após tudo carregar (mínimo 3s para dar tempo de ver a animação)
     setTimeout(() => {
@@ -11,8 +508,11 @@ window.addEventListener('load', () => {
         // Remover do DOM após a transição
         setTimeout(() => {
             loadingScreen.remove();
-        }, 500);
-    }, 3000);
+            sessionStorage.setItem('portfolioLoaded', 'true');
+            loadingFinished = true;
+            startMotionWhenReady();
+        }, 800);
+    }, 1900);
 });
 
 // ====================================
@@ -54,7 +554,7 @@ function showToast(title, message, type = 'info', duration = 5000) {
                 if (toast.parentElement) {
                     toast.remove();
                 }
-            }, 300);
+            }, 750);
         }, duration);
     }
     
@@ -100,7 +600,7 @@ function showToast(title, message, type = 'info', duration = 5000) {
                 if (toast.parentElement) {
                     toast.remove();
                 }
-            }, 300);
+            }, 750);
         }, duration);
     }
     
@@ -115,6 +615,9 @@ const nav = document.getElementById('nav');
 
 menuToggle.addEventListener('click', () => {
     nav.classList.toggle('active');
+    const isMenuOpen = nav.classList.contains('active');
+    menuToggle.setAttribute('aria-expanded', String(isMenuOpen));
+    menuToggle.setAttribute('aria-label', isMenuOpen ? 'Fechar menu' : 'Abrir menu');
     
     // Animação do ícone hambúrguer
     const spans = menuToggle.querySelectorAll('span');
@@ -144,15 +647,24 @@ if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
     body.classList.add('dark-mode');
 }
 
+function syncThemeToggleState() {
+    const isDarkMode = body.classList.contains('dark-mode');
+    themeToggle.setAttribute('aria-pressed', String(isDarkMode));
+    themeToggle.setAttribute('aria-label', isDarkMode ? 'Ativar tema claro' : 'Ativar tema escuro');
+}
+
+syncThemeToggleState();
+
 // Toggle do tema
 themeToggle.addEventListener('click', () => {
     body.classList.toggle('dark-mode');
+    syncThemeToggleState();
     
     // Adicionar animação de pulso
     themeToggle.classList.add('pulse');
     setTimeout(() => {
         themeToggle.classList.remove('pulse');
-    }, 500);
+    }, 750);
     
     // Salvar preferência
     const currentTheme = body.classList.contains('dark-mode') ? 'dark' : 'light';
@@ -165,6 +677,8 @@ navLinks.forEach(link => {
     link.addEventListener('click', () => {
         if (window.innerWidth <= 768) {
             nav.classList.remove('active');
+            menuToggle.setAttribute('aria-expanded', 'false');
+            menuToggle.setAttribute('aria-label', 'Abrir menu');
             const spans = menuToggle.querySelectorAll('span');
             spans[0].style.transform = 'none';
             spans[1].style.opacity = '1';
@@ -177,22 +691,28 @@ navLinks.forEach(link => {
 // Smooth Scroll Suave e Satisfatório
 // ====================================
 function smoothScrollTo(targetPosition, duration = 1200) {
+    if (lenis) {
+        lenis.scrollTo(targetPosition, {
+            duration: duration / 1000,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t))
+        });
+        return;
+    }
+
     const startPosition = window.pageYOffset;
     const distance = targetPosition - startPosition;
     let startTime = null;
 
-    // Função de easing (suavização) - easeInOutCubic para movimento bem suave
-    function easeInOutCubic(t) {
-        return t < 0.5
-            ? 4 * t * t * t
-            : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    // Fallback com expo.out para manter a mesma linguagem de movimento do GSAP.
+    function expoOut(t) {
+        return t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
     }
 
     function animation(currentTime) {
         if (startTime === null) startTime = currentTime;
         const timeElapsed = currentTime - startTime;
         const progress = Math.min(timeElapsed / duration, 1);
-        const ease = easeInOutCubic(progress);
+        const ease = expoOut(progress);
         
         window.scrollTo(0, startPosition + distance * ease);
 
@@ -252,13 +772,15 @@ const observerOptions = {
 };
 
 const observer = new IntersectionObserver((entries) => {
+    if (document.body.classList.contains('gsap-ready')) return;
+
     entries.forEach(entry => {
         if (entry.isIntersecting) {
             entry.target.style.opacity = '0';
             entry.target.style.transform = 'translateY(20px)';
             
             setTimeout(() => {
-                entry.target.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                entry.target.style.transition = 'opacity 0.7s var(--ease-power3-out), transform 0.7s var(--ease-power3-out)';
                 entry.target.style.opacity = '1';
                 entry.target.style.transform = 'translateY(0)';
             }, 100);
@@ -277,6 +799,8 @@ document.querySelectorAll('.project-card, .contato-card').forEach(card => {
 // Animação da Foto ao Scroll
 // ====================================
 const photoObserver = new IntersectionObserver((entries) => {
+    if (document.body.classList.contains('gsap-ready')) return;
+
     entries.forEach(entry => {
         const sobreImage = entry.target;
         if (entry.isIntersecting) {
@@ -285,7 +809,7 @@ const photoObserver = new IntersectionObserver((entries) => {
             sobreImage.style.transform = 'scale(0.8) rotate(-10deg)';
             
             setTimeout(() => {
-                sobreImage.style.transition = 'opacity 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55), transform 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+                sobreImage.style.transition = 'opacity 0.8s var(--ease-expo-out), transform 0.8s var(--ease-expo-out)';
                 sobreImage.style.opacity = '1';
                 sobreImage.style.transform = 'scale(1) rotate(0deg)';
             }, 150);
@@ -308,6 +832,8 @@ if (sobreImageElement) {
 // Animação das Barras de Tecnologia (RPG Style)
 // ====================================
 const techObserver = new IntersectionObserver((entries) => {
+    if (document.body.classList.contains('gsap-ready')) return;
+
     entries.forEach(entry => {
         if (entry.isIntersecting) {
             const techItem = entry.target;
@@ -335,6 +861,8 @@ document.querySelectorAll('.tech-item').forEach(item => {
 // Animações Snap no Scroll
 // ====================================
 const snapObserver = new IntersectionObserver((entries) => {
+    if (document.body.classList.contains('gsap-ready')) return;
+
     entries.forEach(entry => {
         if (entry.isIntersecting) {
             entry.target.classList.add('visible');
@@ -361,15 +889,11 @@ setTimeout(observeOnScroll, 500);
 // ====================================
 let lastScroll = 0;
 const header = document.querySelector('.header');
+let activeHeaderSection = '';
 
 window.addEventListener('scroll', () => {
     const currentScroll = window.pageYOffset;
-    
-    if (currentScroll <= 0) {
-        header.style.boxShadow = 'none';
-    } else {
-        header.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
-    }
+    header.classList.toggle('is-scrolled', currentScroll > 24);
     
     lastScroll = currentScroll;
     
@@ -421,7 +945,8 @@ function updateActiveLink() {
     // ====================================
     // ANIMAÇÃO DO HEADER - Muda conforme a seção
     // ====================================
-    if (header && currentSection) {
+    if (header && currentSection && activeHeaderSection !== currentSection) {
+        activeHeaderSection = currentSection;
         // Remover todas as classes de seção ativa
         header.classList.remove(
             'section-sobre-active',
@@ -437,7 +962,7 @@ function updateActiveLink() {
         header.style.transform = 'scale(0.98)';
         setTimeout(() => {
             header.style.transform = 'scale(1)';
-        }, 150);
+        }, 700);
     }
 }
 
@@ -484,10 +1009,10 @@ if (contactForm) {
 // ====================================
 // Atualizar ano no footer
 // ====================================
-const footer = document.querySelector('.footer p');
-if (footer) {
+const footerYear = document.querySelector('[data-footer-year]');
+if (footerYear) {
     const currentYear = new Date().getFullYear();
-    footer.innerHTML = `&copy; ${currentYear} puertA. Desenvolvido com ☕ e código.`;
+    footerYear.textContent = currentYear;
 }
 
 // ====================================
@@ -590,7 +1115,9 @@ function renderProjects() {
     
     carousel.innerHTML = projectsData.map((project, index) => {
         const isActive = index === 0 ? 'active' : '';
-        const isCollapsed = project.expandable ? 'collapsed' : '';
+        const hasGallery = project.images && project.images.length > 0 ? 'has-gallery' : '';
+        const projectNumber = String(index + 1).padStart(2, '0');
+        const projectTotal = String(projectsData.length).padStart(2, '0');
         
         // Renderizar tags
         const tagsHTML = project.tags.map(tag => 
@@ -649,10 +1176,11 @@ function renderProjects() {
         const statusBadge = `<span class="project-status-badge ${statusClass}">${statusText}</span>`;
         
         return `
-            <div class="project-card ${isActive}">
+            <article class="project-card ${isActive} ${hasGallery}" data-project-index="${projectNumber}">
                 ${infoHTML}
                 <div class="project-header">
                     <div class="project-header-left">
+                        <span class="project-count">${projectNumber} / ${projectTotal}</span>
                         <h3 class="project-title">${project.title}</h3>
                         <div class="project-tags">
                             ${tagsHTML}
@@ -661,15 +1189,18 @@ function renderProjects() {
                     ${statusBadge}
                 </div>
                 <div class="project-content">
-                    <p class="project-description">
-                        ${project.description}
-                    </p>
+                    <div class="project-copy">
+                        <p class="project-description">
+                            ${project.description}
+                        </p>
+                        <span class="project-number-display" aria-hidden="true">${projectNumber}</span>
+                    </div>
                     ${galleryHTML}
                 </div>
                 <div class="project-buttons">
                     ${buttonsHTML}
                 </div>
-            </div>
+            </article>
         `;
     }).join('');
 }
@@ -679,8 +1210,8 @@ function renderIndicators() {
     const indicators = document.getElementById('projectIndicators');
     if (!indicators) return;
     
-    indicators.innerHTML = projectsData.map((_, index) => 
-        `<span class="project-indicator ${index === 0 ? 'active' : ''}" onclick="setProject(${index})"></span>`
+    indicators.innerHTML = projectsData.map((project, index) =>
+        `<button type="button" class="project-indicator ${index === 0 ? 'active' : ''}" onclick="setProject(${index})" aria-label="Abrir projeto ${project.title}">${String(index + 1).padStart(2, '0')}</button>`
     ).join('');
 }
 
@@ -702,6 +1233,7 @@ function changeProject(direction) {
     // Adicionar active ao novo projeto e indicador
     projects[currentProjectIndex].classList.add('active');
     indicators[currentProjectIndex].classList.add('active');
+    animateActiveProject(projects[currentProjectIndex]);
 }
 
 function setProject(index) {
@@ -718,11 +1250,13 @@ function setProject(index) {
     currentProjectIndex = index;
     projects[index].classList.add('active');
     indicators[index].classList.add('active');
+    animateActiveProject(projects[index]);
 }
 
-window.addEventListener('load', () => {
-    loadProjects();
-    loadTechnologies();
+window.addEventListener('load', async () => {
+    await Promise.all([loadProjects(), loadTechnologies()]);
+    portfolioDataReady = true;
+    startMotionWhenReady();
 });
 
 // ====================================
@@ -730,7 +1264,7 @@ window.addEventListener('load', () => {
 // ====================================
 async function loadTechnologies() {
     try {
-        const response = await fetch('technologies.json');
+        const response = await fetch('technologies.json?v=2');
         const data = await response.json();
         renderTechnologies(data.techStacks);
     } catch (error) {
@@ -742,17 +1276,21 @@ function renderTechnologies(techStacks) {
     const container = document.getElementById('techStacksContainer');
     if (!container) return;
     
-    container.innerHTML = techStacks.map(stack => {
+    container.innerHTML = techStacks.map((stack, stackIndex) => {
         const technologiesHTML = stack.technologies.map(tech => `
-            <div class="tech-item" title="${tech.name} - ${tech.level}/100">
+            <div class="tech-item" title="${tech.name} - ${tech.level}/100" data-tech-name="${tech.name}">
                 <span class="tech-icon"><i class="${tech.icon}"></i></span>
+                <span class="tech-name">${tech.name}</span>
                 <span class="tech-level">${tech.level}/100</span>
             </div>
         `).join('');
         
         return `
             <div class="tech-stack">
-                <h3 class="tech-stack-title">${stack.title}</h3>
+                <div class="tech-stack-header">
+                    <span class="tech-stack-index">${String(stackIndex + 1).padStart(2, '0')}</span>
+                    <h3 class="tech-stack-title">${stack.title}</h3>
+                </div>
                 <div class="tech-list">
                     ${technologiesHTML}
                 </div>
@@ -821,7 +1359,7 @@ function hideInfoTooltip() {
                 activeTooltip.style.display = 'none';
                 activeTooltip = null;
             }
-        }, 300);
+        }, 700);
     }
 }
 

@@ -2,7 +2,7 @@
   "techStacks": [
     {
       "id": "frontend",
-      "title": "🎨 Frontend",
+      "title": "Front-end",
       "technologies": [
         {
           "name": "HTML5",
@@ -43,7 +43,7 @@
     },
     {
       "id": "backend",
-      "title": "⚙️ Backend",
+      "title": "Back-end",
       "technologies": [
         {
           "name": "Node.js",
@@ -69,7 +69,7 @@
     },
     {
       "id": "database",
-      "title": "🗄️ Banco de Dados",
+      "title": "Banco de dados",
       "technologies": [
         {
           "name": "MySQL",
@@ -85,7 +85,7 @@
     },
     {
       "id": "devops",
-      "title": "🔧 DevOps & Ferramentas",
+      "title": "DevOps + ferramentas",
       "technologies": [
         {
           "name": "Git",
@@ -111,7 +111,7 @@
     },
     {
       "id": "design",
-      "title": "🎨 Design & Documentação",
+      "title": "Design + documentação",
       "technologies": [
         {
           "name": "Figma",
