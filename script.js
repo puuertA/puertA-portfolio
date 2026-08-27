@@ -4,6 +4,10 @@
 let lenis = null;
 let loadingFinished = false;
 let motionStarted = false;
+let pageAssetsLoaded = false;
+let loadingIntroComplete = false;
+let loadingExitStarted = false;
+let loadingAmbientTweens = [];
 
 function initLenis() {
     if (!window.Lenis || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -46,6 +50,20 @@ function animatePageIntro() {
     gsap.set('.hero-meta, .hero-description, .hero-actions .btn, .hero-scroll-indicator, .hero-corner', {
         autoAlpha: 0
     });
+    gsap.set('.hero-frame', {
+        autoAlpha: 0,
+        scaleX: 0.94,
+        scaleY: 0.96,
+        transformOrigin: 'center center'
+    });
+    gsap.set('.hero-video-wash, .hero-noise, .hero-video-accent', { autoAlpha: 0 });
+    gsap.set('.hero-bottom', { autoAlpha: 0, y: 30 });
+    gsap.set('.hero-tension-track', {
+        autoAlpha: 0,
+        scaleX: 0.38,
+        transformOrigin: 'center center'
+    });
+    gsap.set('.hero-scroll-label, .hero-scroll-arrow', { autoAlpha: 0 });
     gsap.set('.hero-tension-bar', { scaleX: 0, transformOrigin: 'left center' });
     gsap.set('.hero-prelude', { autoAlpha: 0 });
     gsap.set('.hero-video', { autoAlpha: 0, scale: 1.12 });
@@ -64,8 +82,24 @@ function animatePageIntro() {
 
     heroTimeline
         .from('.header', { y: -90, autoAlpha: 0, duration: 0.65 }, 0)
+        .to('.hero-frame', {
+            autoAlpha: 1,
+            scaleX: 1,
+            scaleY: 1,
+            duration: 1.1,
+            ease: 'expo.out'
+        }, 0)
         .to('.hero-video', { autoAlpha: 1, scale: 1.045, duration: 1.7, ease: 'power3.out' }, 0)
+        .to('.hero-video-wash', { autoAlpha: 1, duration: 1.2, ease: 'power3.out' }, 0.04)
+        .to('.hero-noise', { autoAlpha: 0.2, duration: 1.05, ease: 'power3.out' }, 0.1)
+        .to('.hero-video-accent', { autoAlpha: 1, duration: 1.15, ease: 'expo.out' }, 0.14)
         .to('.hero-prelude', { autoAlpha: 1, duration: 0.65 }, 0.16)
+        .to('.hero-tension-track', {
+            autoAlpha: 1,
+            scaleX: 1,
+            duration: 0.8,
+            ease: 'expo.out'
+        }, 0.2)
         .from('.hero-prelude-index, .hero-prelude-status', {
             y: 12,
             autoAlpha: 0,
@@ -96,18 +130,171 @@ function animatePageIntro() {
             duration: 0.72,
             ease: 'expo.inOut'
         }, 1.62)
+        .to('.hero-bottom', { autoAlpha: 1, y: 0, duration: 0.75, ease: 'power3.out' }, 1.72)
         .to('.hero-description', { autoAlpha: 1, duration: 0.65 }, 1.82)
         .from('.hero-description', { y: 28, duration: 0.72 }, 1.82)
         .to('.hero-actions .btn', { autoAlpha: 1, duration: 0.65, stagger: 0.04 }, 1.92)
         .from('.hero-actions .btn', { y: 24, stagger: 0.08, duration: 0.72 }, 1.92)
         .to('.hero-corner', { autoAlpha: 1, stagger: 0.08, duration: 0.65 }, 2.08)
         .to('.hero-scroll-indicator', { autoAlpha: 1, duration: 0.7 }, 2.2)
-        .from('.hero-scroll-line', { scaleY: 0, transformOrigin: 'top', duration: 0.7 }, 2.18);
+        .from('.hero-scroll-line', {
+            scaleY: 0,
+            transformOrigin: 'top',
+            duration: 0.7,
+            ease: 'expo.out'
+        }, 2.18)
+        .to('.hero-scroll-label, .hero-scroll-arrow', {
+            autoAlpha: 1,
+            duration: 0.65,
+            stagger: 0.08,
+            ease: 'power3.out'
+        }, 2.24);
 
     // A primeira pintura só é liberada depois de todos os estados iniciais
     // da timeline existirem, evitando o flash do hero antes do loading.
     releaseFirstPaint();
     requestAnimationFrame(() => heroTimeline.play(0));
+}
+
+function initHeroAmbientMotion() {
+    const hero = document.querySelector('.section-hero');
+
+    if (!hero || !window.gsap) return;
+    if (hero.dataset.ambientMotionBound === 'true') return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    hero.dataset.ambientMotionBound = 'true';
+
+    gsap.to('.hero-scroll-arrow', {
+        y: 6,
+        duration: 0.7,
+        repeat: -1,
+        yoyo: true,
+        ease: 'power3.inOut'
+    });
+
+    gsap.to('.hero-noise', {
+        xPercent: 0.45,
+        yPercent: -0.45,
+        scale: 1.025,
+        duration: 5.2,
+        repeat: -1,
+        yoyo: true,
+        ease: 'power3.inOut'
+    });
+
+    gsap.to('.hero-video-accent', {
+        xPercent: 3.5,
+        yPercent: -1.5,
+        rotation: 0.45,
+        scale: 1.025,
+        duration: 6.4,
+        repeat: -1,
+        yoyo: true,
+        ease: 'expo.inOut'
+    });
+}
+
+function initHeroInteractiveMotion() {
+    const hero = document.querySelector('.section-hero');
+
+    if (!hero || !window.gsap) return;
+    if (hero.dataset.interactiveMotionBound === 'true') return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    hero.dataset.interactiveMotionBound = 'true';
+
+    const readHeroColor = name => getComputedStyle(hero).getPropertyValue(name).trim();
+
+    hero.querySelectorAll('.hero-actions .btn').forEach((button, index) => {
+        const isPrimary = button.classList.contains('btn-primary');
+
+        const animateIn = () => {
+            const shadow = readHeroColor(isPrimary ? '--hero-primary-shadow' : '--hero-secondary-shadow');
+
+            gsap.to(button, {
+                x: -4,
+                y: -4,
+                rotation: index % 2 === 0 ? -0.65 : 0.65,
+                backgroundColor: '#5E81F4',
+                color: isPrimary ? '#111111' : '#FFFFFF',
+                borderColor: '#111111',
+                boxShadow: `6px 6px 0 ${shadow}`,
+                duration: 0.65,
+                ease: 'expo.out',
+                overwrite: 'auto'
+            });
+        };
+
+        const animateOut = () => {
+            const prefix = isPrimary ? '--hero-primary' : '--hero-secondary';
+
+            gsap.to(button, {
+                x: 0,
+                y: 0,
+                rotation: 0,
+                backgroundColor: readHeroColor(`${prefix}-bg`),
+                color: readHeroColor(`${prefix}-ink`),
+                borderColor: readHeroColor(`${prefix}-border`),
+                boxShadow: `4px 4px 0 ${readHeroColor(`${prefix}-shadow`)}`,
+                duration: 0.7,
+                ease: 'power3.out',
+                overwrite: 'auto',
+                onComplete: () => gsap.set(button, {
+                    clearProps: 'transform,backgroundColor,color,borderColor,boxShadow'
+                })
+            });
+        };
+
+        button.addEventListener('mouseenter', animateIn);
+        button.addEventListener('mouseleave', animateOut);
+        button.addEventListener('focus', animateIn);
+        button.addEventListener('blur', animateOut);
+    });
+
+    const scrollIndicator = hero.querySelector('.hero-scroll-indicator');
+    const scrollArrow = scrollIndicator?.querySelector('.hero-scroll-arrow');
+
+    if (!scrollIndicator || !scrollArrow) return;
+
+    const animateIndicatorIn = () => {
+        gsap.to(scrollIndicator, {
+            x: -5,
+            color: '#FEE440',
+            duration: 0.65,
+            ease: 'expo.out',
+            overwrite: 'auto'
+        });
+        gsap.to(scrollArrow, {
+            rotation: -8,
+            scale: 1.12,
+            duration: 0.65,
+            ease: 'expo.out',
+            overwrite: 'auto'
+        });
+    };
+
+    const animateIndicatorOut = () => {
+        gsap.to(scrollIndicator, {
+            x: 0,
+            color: readHeroColor('--hero-ink'),
+            duration: 0.7,
+            ease: 'power3.out',
+            overwrite: 'auto'
+        });
+        gsap.to(scrollArrow, {
+            rotation: 0,
+            scale: 1,
+            duration: 0.7,
+            ease: 'power3.out',
+            overwrite: 'auto'
+        });
+    };
+
+    scrollIndicator.addEventListener('mouseenter', animateIndicatorIn);
+    scrollIndicator.addEventListener('mouseleave', animateIndicatorOut);
+    scrollIndicator.addEventListener('focus', animateIndicatorIn);
+    scrollIndicator.addEventListener('blur', animateIndicatorOut);
 }
 
 function initPinnedCameraSequence() {
@@ -128,9 +315,19 @@ function initPinnedCameraSequence() {
         const isMobile = context.conditions.isMobile;
         const sequenceItems = gsap.utils.toArray('.camera-sequence-item', section);
         const cameraGrid = section.querySelector('.camera-grid');
+        const gridGlow = section.querySelector('.camera-grid-glow');
+        const cameraFrame = section.querySelector('.camera-frame');
+        const frameCorners = gsap.utils.toArray('.camera-frame-corner', section);
+        const sectionNumber = section.querySelector('.camera-section-number');
+        const topbar = section.querySelector('.camera-topbar');
+        const progress = section.querySelector('.camera-progress');
+        const progressDetails = gsap.utils.toArray('.camera-progress-label, .camera-progress-track, .camera-progress-time', section);
         const progressFill = section.querySelector('.camera-progress-fill');
         const orbitA = section.querySelector('.camera-orbit-a');
         const orbitB = section.querySelector('.camera-orbit-b');
+        const cards = gsap.utils.toArray('.camera-card', section);
+        const cardDetails = cards.flatMap(card => Array.from(card.querySelectorAll('.camera-card-index, h3, p')));
+        const cardShapes = gsap.utils.toArray('.camera-card-shape', section);
 
         gsap.set(sequenceItems, {
             autoAlpha: 0,
@@ -140,6 +337,30 @@ function initPinnedCameraSequence() {
             rotateX: 4,
             transformOrigin: 'center bottom'
         });
+        gsap.set(cameraFrame, {
+            autoAlpha: 0,
+            scaleX: 0.96,
+            scaleY: 0.96,
+            transformOrigin: 'center center'
+        });
+        gsap.set(frameCorners, {
+            autoAlpha: 0,
+            scale: 0.35,
+            transformOrigin: 'center center'
+        });
+        gsap.set(sectionNumber, {
+            autoAlpha: 0,
+            yPercent: 8,
+            scale: 0.9,
+            transformOrigin: 'right bottom'
+        });
+        gsap.set(topbar, { autoAlpha: 0, y: -22, scaleX: 0.92, transformOrigin: 'left center' });
+        gsap.set(progress, { autoAlpha: 0, x: isMobile ? 0 : 20, y: isMobile ? 14 : 0 });
+        gsap.set(progressDetails, { autoAlpha: 0, scale: 0.86 });
+        gsap.set(gridGlow, { autoAlpha: 0, scale: 1.12, rotation: -2 });
+        gsap.set([orbitA, orbitB], { autoAlpha: 0 });
+        gsap.set(cardDetails, { autoAlpha: 0, y: 18, rotation: -1.5 });
+        gsap.set(cardShapes, { autoAlpha: 0, scale: 0.4, rotation: -28 });
         gsap.set(progressFill, {
             scaleX: isMobile ? 0 : 1,
             scaleY: isMobile ? 1 : 0,
@@ -180,19 +401,70 @@ function initPinnedCameraSequence() {
                 0
             )
             .fromTo(cameraGrid,
-                { scale: 1.18, xPercent: -4, yPercent: -3 },
+                { scale: 1.18, xPercent: -4, yPercent: -3, autoAlpha: 0 },
                 {
                     scale: 1.02,
                     xPercent: 2,
                     yPercent: 2,
+                    autoAlpha: 1,
                     backgroundPosition: '108px 54px',
                     duration: 2.8,
                     ease: 'power3.out'
                 },
                 0
             )
+            .to(cameraFrame, {
+                autoAlpha: 1,
+                scaleX: 1,
+                scaleY: 1,
+                duration: 1.05,
+                ease: 'expo.out'
+            }, 0.04)
+            .to(frameCorners, {
+                autoAlpha: 1,
+                scale: 1,
+                duration: 0.72,
+                stagger: 0.08,
+                ease: 'expo.out'
+            }, 0.1)
+            .to(sectionNumber, {
+                autoAlpha: 0.065,
+                yPercent: 0,
+                scale: 1,
+                duration: 1.2,
+                ease: 'power3.out'
+            }, 0.08)
+            .to(gridGlow, {
+                autoAlpha: 1,
+                scale: 1,
+                rotation: 0,
+                duration: 1.4,
+                ease: 'expo.out'
+            }, 0.14)
+            .to(topbar, {
+                autoAlpha: 1,
+                y: 0,
+                scaleX: 1,
+                duration: 0.75,
+                ease: 'power3.out'
+            }, 0.24)
+            .to(progress, {
+                autoAlpha: 1,
+                x: 0,
+                y: 0,
+                duration: 0.75,
+                ease: 'power3.out'
+            }, 0.28)
+            .to(progressDetails, {
+                autoAlpha: 1,
+                scale: 1,
+                duration: 0.7,
+                stagger: 0.08,
+                ease: 'expo.out'
+            }, 0.34)
             .to(progressFill, { scaleX: 1, scaleY: 1, duration: 2.8, ease: 'power3.inOut' }, 0)
             .to(orbitA, {
+                autoAlpha: 1,
                 xPercent: -65,
                 yPercent: 34,
                 rotate: 75,
@@ -201,6 +473,7 @@ function initPinnedCameraSequence() {
                 ease: 'power3.out'
             }, 0.15)
             .to(orbitB, {
+                autoAlpha: 1,
                 xPercent: 78,
                 yPercent: -52,
                 rotate: -45,
@@ -222,6 +495,29 @@ function initPinnedCameraSequence() {
             }, index * 0.2);
         });
 
+        cards.forEach((card, index) => {
+            const details = card.querySelectorAll('.camera-card-index, h3, p');
+            const shape = card.querySelector('.camera-card-shape');
+            const cardStart = (index + 3) * 0.2 + 0.12;
+
+            cameraTimeline.to(details, {
+                autoAlpha: 1,
+                y: 0,
+                rotation: 0,
+                duration: 0.7,
+                stagger: 0.08,
+                ease: 'expo.out'
+            }, cardStart);
+
+            cameraTimeline.to(shape, {
+                autoAlpha: 1,
+                scale: 1,
+                rotation: 18,
+                duration: 0.75,
+                ease: 'power3.out'
+            }, cardStart + 0.08);
+        });
+
         cameraTimeline.to(cameraWorld, {
             scale: isMobile ? 0.97 : 0.94,
             xPercent: isMobile ? -2 : -3,
@@ -230,8 +526,893 @@ function initPinnedCameraSequence() {
             ease: 'power3.out'
         }, 1.78);
 
+        cameraTimeline
+            .to(sectionNumber, {
+                autoAlpha: 0.025,
+                yPercent: -4,
+                scale: 1.035,
+                duration: 1.05,
+                ease: 'power3.inOut'
+            }, 1.78)
+            .to(cameraFrame, {
+                autoAlpha: 0.38,
+                scaleX: 0.985,
+                scaleY: 0.985,
+                duration: 1.05,
+                ease: 'power3.inOut'
+            }, 1.78)
+            .to(progress, {
+                autoAlpha: 0.35,
+                duration: 0.7,
+                ease: 'expo.inOut'
+            }, 2.08);
+
         return () => cameraTimeline.scrollTrigger?.kill();
     });
+}
+
+function initAboutSectionAnimations() {
+    const section = document.querySelector('.section-sobre');
+
+    if (!section || !window.gsap || !window.ScrollTrigger) return;
+    if (section.dataset.motionBound === 'true') return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    section.dataset.motionBound = 'true';
+
+    const grid = section.querySelector('.section-sobre-grid');
+    const backgroundNumber = section.querySelector('.section-sobre-number');
+    const masthead = section.querySelector('.section-masthead');
+    const sectionIndex = section.querySelector('.section-index');
+    const sectionTitle = section.querySelector('.section-title');
+    const sectionNote = section.querySelector('.section-note');
+    const imageWrapper = section.querySelector('.sobre-image-wrapper');
+    const imageLabel = section.querySelector('.sobre-image-label');
+    const imageCorner = section.querySelector('.sobre-image-corner');
+    const card = section.querySelector('.sobre-card');
+    const eyebrow = section.querySelector('.sobre-eyebrow');
+    const name = section.querySelector('.sobre-text h3');
+    const paragraphs = section.querySelectorAll('.sobre-text > p');
+    const academic = section.querySelector('.sobre-academic');
+    const academicHeaderItems = section.querySelectorAll('.academic-label, .academic-semester');
+    const academicProgram = section.querySelector('.academic-program');
+    const academicProgramItems = section.querySelectorAll('.academic-program > span, .academic-program h4, .academic-program p');
+    const academicFacts = section.querySelectorAll('.academic-facts > div');
+    const coursework = section.querySelector('.academic-coursework');
+    const courseworkLabel = section.querySelector('.academic-coursework > span');
+    const courseworkItems = section.querySelectorAll('.academic-coursework li');
+    const footer = section.querySelector('.sobre-card-footer');
+    const footerItems = section.querySelectorAll('.sobre-tags span, .sobre-card-footer .btn');
+
+    const aboutTimeline = gsap.timeline({
+        defaults: { ease: 'power3.out' },
+        scrollTrigger: {
+            trigger: section,
+            start: 'top 78%',
+            end: 'bottom 12%',
+            toggleActions: 'play reverse play reverse'
+        }
+    });
+
+    aboutTimeline
+        .fromTo(grid,
+            { autoAlpha: 0, scale: 1.08, backgroundPosition: '-54px -54px' },
+            {
+                autoAlpha: 1,
+                scale: 1,
+                backgroundPosition: '0px 0px',
+                duration: 1.2,
+                ease: 'power3.out'
+            },
+            0
+        )
+        .fromTo(backgroundNumber,
+            { autoAlpha: 0, yPercent: 18, scale: 0.88, rotation: 3 },
+            {
+                autoAlpha: 0.09,
+                yPercent: 0,
+                scale: 1,
+                rotation: 0,
+                duration: 1.2,
+                ease: 'expo.out'
+            },
+            0.04
+        )
+        .from(masthead, { autoAlpha: 0, y: -26, duration: 0.85, ease: 'power3.out' }, 0.08)
+        .from(sectionIndex, { autoAlpha: 0, x: -28, rotation: -3, duration: 0.72, ease: 'expo.out' }, 0.12)
+        .fromTo(sectionTitle,
+            { autoAlpha: 0, x: -48, y: 30 },
+            {
+                autoAlpha: 1,
+                x: 0,
+                y: 0,
+                duration: 0.9,
+                ease: 'expo.out'
+            },
+            0.18
+        )
+        .from(sectionNote, { autoAlpha: 0, x: 28, duration: 0.72, ease: 'power3.out' }, 0.28)
+        .from(imageWrapper, {
+            autoAlpha: 0,
+            y: 72,
+            rotation: -3,
+            scale: 0.95,
+            duration: 0.95,
+            ease: 'expo.out'
+        }, 0.34)
+        .fromTo(card,
+            {
+                autoAlpha: 0,
+                y: 62,
+                rotation: 1.5,
+                scale: 0.98
+            },
+            {
+                autoAlpha: 1,
+                y: 0,
+                rotation: 0,
+                scale: 1,
+                duration: 0.95,
+                ease: 'expo.out'
+            },
+            0.38
+        )
+        .from([imageLabel, imageCorner], {
+            autoAlpha: 0,
+            scale: 0.45,
+            rotation: -18,
+            duration: 0.72,
+            stagger: 0.1,
+            ease: 'expo.out'
+        }, 0.5)
+        .from(eyebrow, { autoAlpha: 0, x: -30, rotation: -2, duration: 0.7, ease: 'power3.out' }, 0.54)
+        .from(name, { autoAlpha: 0, y: 36, duration: 0.85, ease: 'expo.out' }, 0.62)
+        .from(paragraphs, {
+            autoAlpha: 0,
+            y: 28,
+            duration: 0.75,
+            stagger: 0.12,
+            ease: 'power3.out'
+        }, 0.76)
+        .from(academic, { autoAlpha: 0, y: 34, duration: 0.85, ease: 'expo.out' }, 0.96)
+        .from(academicHeaderItems, {
+            autoAlpha: 0,
+            y: 18,
+            rotation: -2,
+            duration: 0.7,
+            stagger: 0.1,
+            ease: 'expo.out'
+        }, 1.08)
+        .from(academicProgram, {
+            autoAlpha: 0,
+            y: 28,
+            scale: 0.97,
+            duration: 0.82,
+            ease: 'power3.out'
+        }, 1.2)
+        .from(academicProgramItems, {
+            autoAlpha: 0,
+            y: 20,
+            duration: 0.7,
+            stagger: 0.08,
+            ease: 'expo.out'
+        }, 1.3)
+        .from(academicFacts, {
+            autoAlpha: 0,
+            y: 24,
+            duration: 0.72,
+            stagger: 0.1,
+            ease: 'power3.out'
+        }, 1.48)
+        .from(coursework, { autoAlpha: 0, y: 28, duration: 0.8, ease: 'expo.out' }, 1.66)
+        .from(courseworkLabel, { autoAlpha: 0, x: -20, duration: 0.65, ease: 'power3.out' }, 1.76)
+        .from(courseworkItems, {
+            autoAlpha: 0,
+            y: 18,
+            rotation: -2,
+            scale: 0.9,
+            duration: 0.7,
+            stagger: 0.08,
+            ease: 'expo.out'
+        }, 1.84)
+        .from(footer, { autoAlpha: 0, y: 28, duration: 0.78, ease: 'power3.out' }, 2.02)
+        .from(footerItems, {
+            autoAlpha: 0,
+            y: 18,
+            rotation: -2,
+            duration: 0.7,
+            stagger: 0.08,
+            ease: 'expo.out'
+        }, 2.12);
+}
+
+function addProjectCardReveal(timeline, card, startAt = 0) {
+    if (!timeline || !card) return;
+
+    const infoIcon = card.querySelector('.project-info-icon');
+    const header = card.querySelector('.project-header');
+    const count = card.querySelector('.project-count');
+    const title = card.querySelector('.project-title');
+    const status = card.querySelector('.project-status-badge');
+    const tags = card.querySelectorAll('.project-tags .tag');
+    const content = card.querySelector('.project-content');
+    const description = card.querySelector('.project-description');
+    const projectNumber = card.querySelector('.project-number-display');
+    const gallery = card.querySelector('.project-gallery-carousel');
+    const galleryImage = card.querySelector('.gallery-item.active .gallery-image');
+    const galleryControls = card.querySelectorAll('.gallery-nav, .gallery-dot');
+    const buttonsContainer = card.querySelector('.project-buttons');
+    const buttons = card.querySelectorAll('.project-buttons .btn');
+
+    if (infoIcon) {
+        timeline.fromTo(infoIcon,
+            { autoAlpha: 0, scale: 0.55, rotation: -18 },
+            {
+                autoAlpha: 1,
+                scale: 1,
+                rotation: 0,
+                duration: 0.7,
+                ease: 'expo.out'
+            },
+            startAt
+        );
+    }
+
+    if (header) {
+        timeline.fromTo(header,
+            { autoAlpha: 0, y: 28 },
+            {
+                autoAlpha: 1,
+                y: 0,
+                duration: 0.82,
+                ease: 'power3.out'
+            },
+            startAt
+        );
+    }
+
+    if (count) {
+        timeline.fromTo(count,
+            { autoAlpha: 0, x: -22 },
+            {
+                autoAlpha: 1,
+                x: 0,
+                duration: 0.68,
+                ease: 'expo.out'
+            },
+            startAt + 0.08
+        );
+    }
+
+    if (title) {
+        timeline.fromTo(title,
+            { autoAlpha: 0, y: 34, clipPath: 'inset(0 0 100% 0)' },
+            {
+                autoAlpha: 1,
+                y: 0,
+                clipPath: 'inset(0 0 0% 0)',
+                duration: 0.9,
+                ease: 'expo.out'
+            },
+            startAt + 0.12
+        );
+    }
+
+    if (status) {
+        timeline.fromTo(status,
+            { autoAlpha: 0, x: 24, rotation: 3 },
+            {
+                autoAlpha: 1,
+                x: 0,
+                rotation: 0,
+                duration: 0.72,
+                ease: 'power3.out'
+            },
+            startAt + 0.2
+        );
+    }
+
+    if (tags.length) {
+        timeline.fromTo(tags,
+            { autoAlpha: 0, y: 18, rotation: -3, scale: 0.9 },
+            {
+                autoAlpha: 1,
+                y: 0,
+                rotation: 0,
+                scale: 1,
+                duration: 0.7,
+                stagger: 0.08,
+                ease: 'expo.out'
+            },
+            startAt + 0.28
+        );
+    }
+
+    if (content) {
+        timeline.fromTo(content,
+            { autoAlpha: 0, y: 34 },
+            {
+                autoAlpha: 1,
+                y: 0,
+                duration: 0.86,
+                ease: 'power3.out'
+            },
+            startAt + 0.42
+        );
+    }
+
+    if (description) {
+        timeline.fromTo(description,
+            { autoAlpha: 0, x: -26 },
+            {
+                autoAlpha: 1,
+                x: 0,
+                duration: 0.78,
+                ease: 'expo.out'
+            },
+            startAt + 0.5
+        );
+    }
+
+    if (projectNumber) {
+        timeline.fromTo(projectNumber,
+            { autoAlpha: 0, x: 46, y: 28, rotation: 4, scale: 0.82 },
+            {
+                autoAlpha: 0.18,
+                x: 0,
+                y: 0,
+                rotation: 0,
+                scale: 1,
+                duration: 1,
+                ease: 'expo.out'
+            },
+            startAt + 0.54
+        );
+    }
+
+    if (gallery) {
+        timeline.fromTo(gallery,
+            { autoAlpha: 0, x: 38, rotation: 1.5, scale: 0.96 },
+            {
+                autoAlpha: 1,
+                x: 0,
+                rotation: 0,
+                scale: 1,
+                duration: 0.9,
+                ease: 'expo.out'
+            },
+            startAt + 0.5
+        );
+    }
+
+    if (galleryImage) {
+        timeline.fromTo(galleryImage,
+            { autoAlpha: 0, scale: 1.08 },
+            {
+                autoAlpha: 1,
+                scale: 1,
+                duration: 0.85,
+                ease: 'power3.out'
+            },
+            startAt + 0.64
+        );
+    }
+
+    if (galleryControls.length) {
+        timeline.fromTo(galleryControls,
+            { autoAlpha: 0, y: 14, rotation: -5, scale: 0.82 },
+            {
+                autoAlpha: 1,
+                y: 0,
+                rotation: 0,
+                scale: 1,
+                duration: 0.7,
+                stagger: 0.08,
+                ease: 'expo.out'
+            },
+            startAt + 0.72
+        );
+    }
+
+    if (buttonsContainer) {
+        timeline.fromTo(buttonsContainer,
+            { autoAlpha: 0, y: 24 },
+            {
+                autoAlpha: 1,
+                y: 0,
+                duration: 0.76,
+                ease: 'power3.out'
+            },
+            startAt + 0.76
+        );
+    }
+
+    if (buttons.length) {
+        timeline.fromTo(buttons,
+            { autoAlpha: 0, y: 18, rotation: -2 },
+            {
+                autoAlpha: 1,
+                y: 0,
+                rotation: 0,
+                duration: 0.7,
+                stagger: 0.1,
+                ease: 'expo.out'
+            },
+            startAt + 0.84
+        );
+    }
+}
+
+function initProjectSectionAnimations() {
+    const section = document.querySelector('.section-projetos');
+    const cards = section ? section.querySelectorAll('.project-card') : [];
+
+    if (!section || !cards.length || !window.gsap || !window.ScrollTrigger) return;
+    if (section.dataset.motionBound === 'true') return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    section.dataset.motionBound = 'true';
+    document.body.classList.add('project-motion-ready');
+
+    const grid = section.querySelector('.section-projetos-grid');
+    const backgroundNumber = section.querySelector('.section-projetos-number');
+    const masthead = section.querySelector('.section-masthead');
+    const sectionIndex = section.querySelector('.section-index');
+    const sectionTitle = section.querySelector('.section-title');
+    const sectionNote = section.querySelector('.section-note');
+    const carouselWrapper = section.querySelector('.projetos-carousel-wrapper');
+    const activeCard = section.querySelector('.project-card.active');
+    const projectNav = section.querySelectorAll('.project-nav');
+    const indicators = section.querySelector('.project-indicators');
+    const indicatorItems = section.querySelectorAll('.project-indicator');
+
+    initProjectInteractiveMotion(section);
+
+    const projectTimeline = gsap.timeline({
+        defaults: { ease: 'power3.out' },
+        scrollTrigger: {
+            trigger: section,
+            start: 'top 78%',
+            end: 'bottom 12%',
+            toggleActions: 'play reverse play reverse'
+        }
+    });
+
+    projectTimeline
+        .fromTo(grid,
+            { autoAlpha: 0, scale: 1.08, backgroundPosition: '-54px -54px' },
+            {
+                autoAlpha: 1,
+                scale: 1,
+                backgroundPosition: '0px 0px',
+                duration: 1.2,
+                ease: 'power3.out'
+            },
+            0
+        )
+        .fromTo(backgroundNumber,
+            { autoAlpha: 0, yPercent: 18, scale: 0.88, rotation: -3 },
+            {
+                autoAlpha: 0.09,
+                yPercent: 0,
+                scale: 1,
+                rotation: 0,
+                duration: 1.2,
+                ease: 'expo.out'
+            },
+            0.04
+        )
+        .fromTo(masthead,
+            { autoAlpha: 0, y: -26 },
+            { autoAlpha: 1, y: 0, duration: 0.85, ease: 'power3.out' },
+            0.08
+        )
+        .fromTo(sectionIndex,
+            { autoAlpha: 0, x: -28, rotation: -3 },
+            { autoAlpha: 1, x: 0, rotation: 0, duration: 0.72, ease: 'expo.out' },
+            0.12
+        )
+        .fromTo(sectionTitle,
+            { autoAlpha: 0, x: -48, y: 30 },
+            { autoAlpha: 1, x: 0, y: 0, duration: 0.9, ease: 'expo.out' },
+            0.18
+        )
+        .fromTo(sectionNote,
+            { autoAlpha: 0, x: 28 },
+            { autoAlpha: 1, x: 0, duration: 0.72, ease: 'power3.out' },
+            0.28
+        )
+        .fromTo(carouselWrapper,
+            { autoAlpha: 0, y: 70, rotation: 1.2, scale: 0.98 },
+            {
+                autoAlpha: 1,
+                y: 0,
+                rotation: 0,
+                scale: 1,
+                duration: 0.95,
+                ease: 'expo.out'
+            },
+            0.34
+        );
+
+    if (activeCard) {
+        projectTimeline.fromTo(activeCard,
+            { autoAlpha: 0, y: 48, rotation: -1.2, scale: 0.96 },
+            {
+                autoAlpha: 1,
+                y: 0,
+                rotation: 0,
+                scale: 1,
+                duration: 0.95,
+                ease: 'expo.out'
+            },
+            0.42
+        );
+
+        addProjectCardReveal(projectTimeline, activeCard, 0.58);
+    }
+
+    if (projectNav.length) {
+        projectTimeline.fromTo(projectNav,
+            { autoAlpha: 0, y: 22, rotation: index => index ? 7 : -7, scale: 0.82 },
+            {
+                autoAlpha: 1,
+                y: 0,
+                rotation: 0,
+                scale: 1,
+                duration: 0.72,
+                stagger: 0.1,
+                ease: 'expo.out'
+            },
+            1.62
+        );
+    }
+
+    if (indicators) {
+        projectTimeline.fromTo(indicators,
+            { autoAlpha: 0, y: 24 },
+            { autoAlpha: 1, y: 0, duration: 0.78, ease: 'power3.out' },
+            1.68
+        );
+    }
+
+    if (indicatorItems.length) {
+        projectTimeline.fromTo(indicatorItems,
+            { autoAlpha: 0, y: 16, rotation: -2, scale: 0.9 },
+            {
+                autoAlpha: 1,
+                y: index => index === currentProjectIndex ? -3 : 0,
+                rotation: 0,
+                scale: 1,
+                duration: 0.7,
+                stagger: 0.08,
+                ease: 'expo.out'
+            },
+            1.76
+        );
+    }
+}
+
+function initProjectInteractiveMotion(section) {
+    if (!section || !window.gsap) return;
+
+    const bindHover = (element, animateIn, animateOut) => {
+        if (!element || element.dataset.gsapHoverBound === 'true') return;
+
+        element.dataset.gsapHoverBound = 'true';
+        element.addEventListener('mouseenter', animateIn);
+        element.addEventListener('mouseleave', animateOut);
+        element.addEventListener('focus', animateIn);
+        element.addEventListener('blur', animateOut);
+    };
+
+    section.querySelectorAll('.project-card').forEach(card => {
+        bindHover(card,
+            () => {
+                if (!card.classList.contains('active') || projectTransitioning) return;
+                const accent = getComputedStyle(section).getPropertyValue('--section-accent-alt').trim();
+                gsap.to(card, {
+                    x: -4,
+                    y: -4,
+                    rotation: -0.25,
+                    boxShadow: `14px 14px 0 ${accent}`,
+                    duration: 0.72,
+                    ease: 'power3.out',
+                    overwrite: 'auto'
+                });
+            },
+            () => {
+                const accent = getComputedStyle(section).getPropertyValue('--section-accent-alt').trim();
+                gsap.to(card, {
+                    x: 0,
+                    y: 0,
+                    rotation: 0,
+                    boxShadow: `10px 10px 0 ${accent}`,
+                    duration: 0.72,
+                    ease: 'power3.out',
+                    overwrite: 'auto'
+                });
+            }
+        );
+    });
+
+    section.querySelectorAll('.project-nav').forEach((button, index) => {
+        bindHover(button,
+            () => gsap.to(button, {
+                x: -3,
+                y: -3,
+                rotation: index ? 2 : -2,
+                scale: 1.04,
+                duration: 0.68,
+                ease: 'expo.out',
+                overwrite: 'auto'
+            }),
+            () => gsap.to(button, {
+                x: 0,
+                y: 0,
+                rotation: 0,
+                scale: 1,
+                duration: 0.68,
+                ease: 'power3.out',
+                overwrite: 'auto'
+            })
+        );
+    });
+
+    section.querySelectorAll('.project-indicator').forEach(indicator => {
+        bindHover(indicator,
+            () => gsap.to(indicator, {
+                y: indicator.classList.contains('active') ? -5 : -3,
+                scale: 1.035,
+                duration: 0.65,
+                ease: 'expo.out',
+                overwrite: 'auto'
+            }),
+            () => gsap.to(indicator, {
+                y: indicator.classList.contains('active') ? -3 : 0,
+                scale: 1,
+                duration: 0.65,
+                ease: 'power3.out',
+                overwrite: 'auto'
+            })
+        );
+    });
+
+    section.querySelectorAll('.project-tags .tag').forEach((tag, index) => {
+        const mark = tag.querySelector('.tag-mark');
+        if (mark) gsap.set(mark, { autoAlpha: 0, x: -8, yPercent: -50, rotation: -18 });
+
+        bindHover(tag,
+            () => {
+                gsap.to(tag, {
+                    y: -4,
+                    rotation: index % 2 ? 1.5 : -1.5,
+                    scale: 1.04,
+                    duration: 0.68,
+                    ease: 'expo.out',
+                    overwrite: 'auto'
+                });
+                if (mark) {
+                    gsap.to(mark, {
+                        autoAlpha: 1,
+                        x: 0,
+                        rotation: 0,
+                        duration: 0.65,
+                        ease: 'power3.out',
+                        overwrite: 'auto'
+                    });
+                }
+            },
+            () => {
+                gsap.to(tag, {
+                    y: 0,
+                    rotation: 0,
+                    scale: 1,
+                    duration: 0.68,
+                    ease: 'power3.out',
+                    overwrite: 'auto'
+                });
+                if (mark) {
+                    gsap.to(mark, {
+                        autoAlpha: 0,
+                        x: -8,
+                        rotation: -18,
+                        duration: 0.65,
+                        ease: 'expo.out',
+                        overwrite: 'auto'
+                    });
+                }
+            }
+        );
+    });
+
+    section.querySelectorAll('.project-buttons .btn').forEach(button => {
+        const label = button.querySelector('.project-button-label');
+        const arrow = button.querySelector('.project-button-arrow');
+
+        if (arrow) gsap.set(arrow, { autoAlpha: 0, x: -10 });
+
+        bindHover(button,
+            () => {
+                gsap.to(button, {
+                    x: -3,
+                    y: -3,
+                    scale: 1.015,
+                    duration: 0.68,
+                    ease: 'expo.out',
+                    overwrite: 'auto'
+                });
+                if (label) gsap.to(label, { x: -2, duration: 0.65, ease: 'power3.out', overwrite: 'auto' });
+                if (arrow) {
+                    gsap.to(arrow, {
+                        autoAlpha: 1,
+                        x: 0,
+                        rotation: -8,
+                        duration: 0.68,
+                        ease: 'expo.out',
+                        overwrite: 'auto'
+                    });
+                }
+            },
+            () => {
+                gsap.to(button, {
+                    x: 0,
+                    y: 0,
+                    scale: 1,
+                    duration: 0.68,
+                    ease: 'power3.out',
+                    overwrite: 'auto'
+                });
+                if (label) gsap.to(label, { x: 0, duration: 0.65, ease: 'power3.out', overwrite: 'auto' });
+                if (arrow) {
+                    gsap.to(arrow, {
+                        autoAlpha: 0,
+                        x: -10,
+                        rotation: 0,
+                        duration: 0.65,
+                        ease: 'expo.out',
+                        overwrite: 'auto'
+                    });
+                }
+            }
+        );
+    });
+
+    section.querySelectorAll('.project-info-icon').forEach(icon => {
+        const tooltip = icon.querySelector('.project-info-tooltip');
+        if (!tooltip) return;
+
+        gsap.set(tooltip, { autoAlpha: 0, y: 10, scale: 0.96 });
+        bindHover(icon,
+            () => {
+                gsap.to(icon, { scale: 1.08, rotation: 4, duration: 0.68, ease: 'expo.out', overwrite: 'auto' });
+                gsap.to(tooltip, {
+                    autoAlpha: 1,
+                    y: 0,
+                    scale: 1,
+                    duration: 0.72,
+                    ease: 'expo.out',
+                    overwrite: 'auto'
+                });
+            },
+            () => {
+                gsap.to(icon, { scale: 1, rotation: 0, duration: 0.68, ease: 'power3.out', overwrite: 'auto' });
+                gsap.to(tooltip, {
+                    autoAlpha: 0,
+                    y: 10,
+                    scale: 0.96,
+                    duration: 0.68,
+                    ease: 'expo.out',
+                    overwrite: 'auto'
+                });
+            }
+        );
+    });
+
+    section.querySelectorAll('.gallery-nav').forEach((button, index) => {
+        gsap.set(button, { yPercent: -50 });
+        bindHover(button,
+            () => gsap.to(button, {
+                x: -3,
+                y: -3,
+                rotation: index % 2 ? 3 : -3,
+                scale: 1.06,
+                duration: 0.68,
+                ease: 'expo.out',
+                overwrite: 'auto'
+            }),
+            () => gsap.to(button, {
+                x: 0,
+                y: 0,
+                rotation: 0,
+                scale: 1,
+                duration: 0.68,
+                ease: 'power3.out',
+                overwrite: 'auto'
+            })
+        );
+    });
+
+    section.querySelectorAll('.gallery-dot').forEach(dot => {
+        bindHover(dot,
+            () => gsap.to(dot, {
+                y: -3,
+                scale: 1.22,
+                rotation: 12,
+                duration: 0.65,
+                ease: 'expo.out',
+                overwrite: 'auto'
+            }),
+            () => gsap.to(dot, {
+                y: 0,
+                scale: 1,
+                rotation: 0,
+                duration: 0.65,
+                ease: 'power3.out',
+                overwrite: 'auto'
+            })
+        );
+    });
+
+    section.querySelectorAll('.gallery-image').forEach(image => {
+        bindHover(image,
+            () => gsap.to(image, { scale: 1.025, duration: 0.75, ease: 'power3.out', overwrite: 'auto' }),
+            () => gsap.to(image, { scale: 1, duration: 0.75, ease: 'power3.out', overwrite: 'auto' })
+        );
+    });
+
+    initProjectLightboxMotion();
+}
+
+function syncProjectIndicators(activeIndex, animate = true) {
+    const indicators = document.querySelectorAll('.project-indicator');
+
+    indicators.forEach((indicator, index) => {
+        const isActive = index === activeIndex;
+        indicator.classList.toggle('active', isActive);
+
+        if (!window.gsap || !animate || !document.body.classList.contains('project-motion-ready')) return;
+
+        gsap.to(indicator, {
+            y: isActive ? -3 : 0,
+            scale: 1,
+            rotation: 0,
+            duration: 0.65,
+            ease: 'power3.out',
+            overwrite: 'auto'
+        });
+    });
+}
+
+function initProjectLightboxMotion() {
+    const closeButton = document.querySelector('.lightbox-close');
+    if (!closeButton || closeButton.dataset.gsapHoverBound === 'true' || !window.gsap) return;
+
+    closeButton.dataset.gsapHoverBound = 'true';
+
+    const animateIn = () => gsap.to(closeButton, {
+        x: -3,
+        y: -3,
+        rotation: 4,
+        scale: 1.04,
+        duration: 0.68,
+        ease: 'expo.out',
+        overwrite: 'auto'
+    });
+    const animateOut = () => gsap.to(closeButton, {
+        x: 0,
+        y: 0,
+        rotation: 0,
+        scale: 1,
+        duration: 0.68,
+        ease: 'power3.out',
+        overwrite: 'auto'
+    });
+
+    closeButton.addEventListener('mouseenter', animateIn);
+    closeButton.addEventListener('mouseleave', animateOut);
+    closeButton.addEventListener('focus', animateIn);
+    closeButton.addEventListener('blur', animateOut);
 }
 
 function initTechnologyScrollAnimations() {
@@ -337,11 +1518,42 @@ function initScrollAnimations() {
             scale: 1.14,
             duration: 1.1,
             ease: 'power3.inOut'
+        }, 0)
+        .to('.hero-frame', {
+            autoAlpha: 0.22,
+            scaleX: 0.98,
+            scaleY: 0.98,
+            duration: 1.1,
+            ease: 'power3.inOut'
+        }, 0)
+        .to('.hero-video-wash', {
+            opacity: 0.62,
+            duration: 1.1,
+            ease: 'power3.inOut'
+        }, 0)
+        .to('.hero-noise', {
+            opacity: 0.06,
+            duration: 1.1,
+            ease: 'power3.inOut'
+        }, 0)
+        .to('.hero-video-accent', {
+            opacity: 0.22,
+            duration: 1.1,
+            ease: 'power3.inOut'
+        }, 0)
+        .to('.hero-corner', {
+            autoAlpha: 0,
+            duration: 0.9,
+            ease: 'expo.inOut'
         }, 0);
 
     initPinnedCameraSequence();
+    initAboutSectionAnimations();
+    initProjectSectionAnimations();
 
     gsap.utils.toArray('.section-title').forEach((title) => {
+        if (title.closest('.section-sobre, .section-projetos')) return;
+
         gsap.fromTo(title,
             { x: -36, opacity: 0 },
             {
@@ -359,24 +1571,7 @@ function initScrollAnimations() {
         );
     });
 
-    gsap.fromTo('.sobre-image',
-        { y: 70, rotate: -4, opacity: 0 },
-        {
-            y: 0,
-            rotate: 0,
-            opacity: 1,
-            duration: 0.85,
-            ease: 'power3.out',
-            scrollTrigger: {
-                trigger: '.section-sobre',
-                start: 'top 70%',
-                end: 'bottom 15%',
-                toggleActions: 'play reverse play reverse'
-            }
-        }
-    );
-
-    gsap.utils.toArray('.sobre-card, .contato-form-container, .contato-social-container').forEach((el, index) => {
+    gsap.utils.toArray('.contato-form-container, .contato-social-container').forEach((el, index) => {
         gsap.fromTo(el,
             { y: 50, opacity: 0, rotate: index % 2 ? 1.5 : -1.5 },
             {
@@ -397,25 +1592,7 @@ function initScrollAnimations() {
 
     initTechnologyScrollAnimations();
 
-    gsap.utils.toArray('.project-card.active').forEach((card) => {
-        gsap.fromTo(card,
-            { scale: 0.92, opacity: 0 },
-            {
-                scale: 1,
-                opacity: 1,
-                duration: 0.75,
-                ease: 'expo.out',
-                scrollTrigger: {
-                    trigger: '.section-projetos',
-                    start: 'top 70%',
-                    end: 'bottom 15%',
-                    toggleActions: 'play reverse play reverse'
-                }
-            }
-        );
-    });
-
-    gsap.utils.toArray('.social-card, .form-group, .project-tags .tag, .project-buttons .btn').forEach((el, index) => {
+    gsap.utils.toArray('.social-card, .form-group').forEach((el, index) => {
         gsap.fromTo(el,
             { y: 24, opacity: 0, rotate: index % 2 ? 1.5 : -1.5 },
             {
@@ -437,20 +1614,15 @@ function initScrollAnimations() {
     ScrollTrigger.refresh();
 }
 
-function animateActiveProject(card) {
-    if (!window.gsap || !card) return;
-
-    gsap.fromTo(card,
-        { x: 34, rotate: 1.5, opacity: 0, scale: 0.96 },
-        { x: 0, rotate: 0, opacity: 1, scale: 1, duration: 0.72, ease: 'expo.out' }
-    );
-}
-
 function initAboutPhotoHoverMotion() {
     const wrapper = document.querySelector('.section-sobre .sobre-image-wrapper');
     const decorations = wrapper ? Array.from(wrapper.querySelectorAll('.photo-decor')) : [];
+    const imageFrame = wrapper?.querySelector('.sobre-image');
+    const portrait = imageFrame?.querySelector('img');
+    const section = wrapper?.closest('.section-sobre');
+    const cvButton = section?.querySelector('.sobre-card-footer .btn');
 
-    if (!wrapper || decorations.length === 0 || !window.gsap) return;
+    if (!wrapper || !imageFrame || !portrait || decorations.length === 0 || !window.gsap) return;
     if (wrapper.dataset.hoverMotionBound === 'true') return;
 
     wrapper.dataset.hoverMotionBound = 'true';
@@ -476,7 +1648,7 @@ function initAboutPhotoHoverMotion() {
         { xPercent: 18, yPercent: 195, rotation: -10 }
     ];
 
-    document.body.classList.add('photo-motion-ready');
+    document.body.classList.add('photo-motion-ready', 'about-motion-ready');
 
     decorations.forEach((decoration, index) => {
         gsap.set(decoration, {
@@ -494,6 +1666,22 @@ function initAboutPhotoHoverMotion() {
         : desktopStates;
 
     const hoverTimeline = gsap.timeline({ paused: true });
+
+    hoverTimeline
+        .to(imageFrame, {
+            x: -4,
+            y: -4,
+            rotation: -1.5,
+            boxShadow: '16px 16px 0 var(--section-accent-alt)',
+            duration: 0.9,
+            ease: 'expo.out'
+        }, 0)
+        .to(portrait, {
+            filter: 'grayscale(0) contrast(1.08)',
+            scale: 1.025,
+            duration: 0.9,
+            ease: 'power3.out'
+        }, 0);
 
     decorations.forEach((decoration, index) => {
         hoverTimeline.to(decoration, {
@@ -519,6 +1707,48 @@ function initAboutPhotoHoverMotion() {
         else hoverTimeline.reverse();
     });
 
+    if (cvButton && section) {
+        const readSectionColor = name => getComputedStyle(section).getPropertyValue(name).trim();
+
+        const animateButtonIn = () => {
+            gsap.to(cvButton, {
+                x: -4,
+                y: -4,
+                rotation: -0.65,
+                backgroundColor: readSectionColor('--section-accent-alt'),
+                color: '#111111',
+                borderColor: readSectionColor('--section-panel-line'),
+                boxShadow: `8px 8px 0 ${readSectionColor('--section-panel-line')}`,
+                duration: 0.65,
+                ease: 'expo.out',
+                overwrite: 'auto'
+            });
+        };
+
+        const animateButtonOut = () => {
+            gsap.to(cvButton, {
+                x: 0,
+                y: 0,
+                rotation: 0,
+                backgroundColor: readSectionColor('--section-accent'),
+                color: '#111111',
+                borderColor: readSectionColor('--section-panel-line'),
+                boxShadow: `6px 6px 0 ${readSectionColor('--section-panel-line')}`,
+                duration: 0.7,
+                ease: 'power3.out',
+                overwrite: 'auto',
+                onComplete: () => gsap.set(cvButton, {
+                    clearProps: 'transform,backgroundColor,color,borderColor,boxShadow'
+                })
+            });
+        };
+
+        cvButton.addEventListener('mouseenter', animateButtonIn);
+        cvButton.addEventListener('mouseleave', animateButtonOut);
+        cvButton.addEventListener('focus', animateButtonIn);
+        cvButton.addEventListener('blur', animateButtonOut);
+    }
+
     if (wrapper.matches(':hover')) hoverTimeline.play();
 }
 
@@ -527,6 +1757,8 @@ function startMotionWhenReady() {
 
     motionStarted = true;
     animatePageIntro();
+    initHeroAmbientMotion();
+    initHeroInteractiveMotion();
     initScrollAnimations();
 }
 
@@ -592,8 +1824,153 @@ initAboutPhotoHoverMotion();
 // ====================================
 // Loading Screen
 // ====================================
-initLenis();
-window.addEventListener('load', () => {
+function startLoadingAmbientMotion(loadingScreen) {
+    if (!window.gsap || !loadingScreen) return;
+
+    const loadingLogoImage = loadingScreen.querySelector('.loading-logo-img');
+    const loadingDecorations = loadingScreen.querySelectorAll('.loading-decor');
+    const loadingTags = loadingScreen.querySelectorAll('.spinner-dot');
+
+    loadingAmbientTweens = [
+        gsap.to(loadingScreen, {
+            backgroundPosition: '44px 44px, 44px 44px',
+            duration: 5.6,
+            repeat: -1,
+            yoyo: true,
+            ease: 'power3.inOut'
+        }),
+        gsap.to(loadingLogoImage, {
+            rotation: 5,
+            scale: 1.035,
+            duration: 0.9,
+            repeat: -1,
+            yoyo: true,
+            ease: 'power3.inOut'
+        }),
+        gsap.to(loadingDecorations, {
+            y: index => index === 0 ? -6 : 5,
+            rotation: index => index === 0 ? 18 : -10,
+            duration: 1.1,
+            stagger: 0.12,
+            repeat: -1,
+            yoyo: true,
+            ease: 'expo.inOut'
+        }),
+        gsap.to(loadingTags, {
+            y: -4,
+            rotation: index => index % 2 === 0 ? -1.5 : 1.5,
+            duration: 0.8,
+            stagger: 0.12,
+            repeat: -1,
+            yoyo: true,
+            ease: 'power3.inOut'
+        })
+    ];
+}
+
+function initLoadingScreenMotion() {
+    const loadingScreen = document.getElementById('loadingScreen');
+
+    if (!loadingScreen || !window.gsap) {
+        document.documentElement.classList.remove('loading-motion-pending');
+        loadingIntroComplete = true;
+        return;
+    }
+
+    const loadingContent = loadingScreen.querySelector('.loading-content');
+    const loadingDecorations = loadingScreen.querySelectorAll('.loading-decor');
+    const loadingLogo = loadingScreen.querySelector('.loading-logo');
+    const loadingLogoImage = loadingScreen.querySelector('.loading-logo-img');
+    const loadingEyebrow = loadingScreen.querySelector('.loading-eyebrow');
+    const loadingTitle = loadingScreen.querySelector('.loading-title');
+    const loadingSubtitle = loadingScreen.querySelector('.loading-subtitle');
+    const loadingBarContainer = loadingScreen.querySelector('.loading-bar-container');
+    const loadingBar = loadingScreen.querySelector('.loading-bar');
+    const loadingTags = loadingScreen.querySelectorAll('.spinner-dot');
+
+    gsap.set(loadingContent, { autoAlpha: 0, y: 34, rotation: -4, scale: 0.94 });
+    gsap.set(loadingDecorations, { autoAlpha: 0, scale: 0.35, rotation: -24 });
+    gsap.set(loadingLogo, { autoAlpha: 0, y: 24, scale: 0.72, rotation: -8 });
+    gsap.set(loadingLogoImage, { rotation: -7, scale: 0.9 });
+    gsap.set([loadingEyebrow, loadingTitle, loadingSubtitle], { autoAlpha: 0, y: 22 });
+    gsap.set(loadingBarContainer, { autoAlpha: 0, scaleX: 0.7, transformOrigin: 'center center' });
+    gsap.set(loadingBar, { scaleX: 0, transformOrigin: 'left center' });
+    gsap.set(loadingTags, { autoAlpha: 0, y: 26, scale: 0.82, rotation: -3 });
+    document.documentElement.classList.remove('loading-motion-pending');
+
+    const loadingTimeline = gsap.timeline({
+        defaults: { ease: 'power3.out' },
+        onComplete: () => {
+            loadingIntroComplete = true;
+            startLoadingAmbientMotion(loadingScreen);
+            finishLoadingWhenReady();
+        }
+    });
+
+    loadingTimeline
+        .to(loadingScreen, {
+            backgroundPosition: '22px 22px, 22px 22px',
+            duration: 2.2,
+            ease: 'power3.out'
+        }, 0)
+        .to(loadingContent, {
+            autoAlpha: 1,
+            y: 0,
+            rotation: -1,
+            scale: 1,
+            duration: 0.9,
+            ease: 'expo.out'
+        }, 0)
+        .to(loadingDecorations, {
+            autoAlpha: 1,
+            scale: 1,
+            rotation: index => index === 0 ? 12 : 0,
+            duration: 0.75,
+            stagger: 0.1,
+            ease: 'expo.out'
+        }, 0.16)
+        .to(loadingLogo, {
+            autoAlpha: 1,
+            y: 0,
+            scale: 1,
+            rotation: 0,
+            duration: 0.78,
+            ease: 'expo.out'
+        }, 0.26)
+        .to(loadingLogoImage, {
+            rotation: 0,
+            scale: 1,
+            duration: 0.72,
+            ease: 'power3.out'
+        }, 0.34)
+        .to(loadingEyebrow, { autoAlpha: 1, y: 0, duration: 0.65, ease: 'expo.out' }, 0.44)
+        .to(loadingTitle, { autoAlpha: 1, y: 0, duration: 0.8, ease: 'expo.out' }, 0.52)
+        .to(loadingSubtitle, { autoAlpha: 1, y: 0, duration: 0.65, ease: 'power3.out' }, 0.64)
+        .to(loadingBarContainer, {
+            autoAlpha: 1,
+            scaleX: 1,
+            duration: 0.7,
+            ease: 'expo.out'
+        }, 0.72)
+        .to(loadingBar, {
+            scaleX: 1,
+            duration: 1.55,
+            ease: 'expo.inOut'
+        }, 0.82)
+        .to(loadingTags, {
+            autoAlpha: 1,
+            y: 0,
+            scale: 1,
+            rotation: 0,
+            duration: 0.7,
+            stagger: 0.12,
+            ease: 'expo.out'
+        }, 1.02);
+}
+
+function finishLoadingWhenReady() {
+    if (!pageAssetsLoaded || !loadingIntroComplete || loadingExitStarted) return;
+
     const loadingScreen = document.getElementById('loadingScreen');
 
     if (!loadingScreen) {
@@ -602,25 +1979,83 @@ window.addEventListener('load', () => {
         return;
     }
 
-    if (sessionStorage.getItem('portfolioLoaded') === 'true') {
+    loadingExitStarted = true;
+    loadingAmbientTweens.forEach(tween => tween.kill());
+    loadingAmbientTweens = [];
+
+    const finish = () => {
         loadingScreen.remove();
         loadingFinished = true;
         startMotionWhenReady();
+    };
+
+    if (!window.gsap) {
+        finish();
         return;
     }
-    
-    // Esconder loading após tudo carregar (mínimo 3s para dar tempo de ver a animação)
-    setTimeout(() => {
-        loadingScreen.classList.add('fade-out');
-        
-        // Remover do DOM após a transição
-        setTimeout(() => {
-            loadingScreen.remove();
-            sessionStorage.setItem('portfolioLoaded', 'true');
-            loadingFinished = true;
-            startMotionWhenReady();
-        }, 800);
-    }, 1900);
+
+    const loadingContent = loadingScreen.querySelector('.loading-content');
+    const loadingDecorations = loadingScreen.querySelectorAll('.loading-decor');
+    const loadingBarContainer = loadingScreen.querySelector('.loading-bar-container');
+    const loadingTags = loadingScreen.querySelectorAll('.spinner-dot');
+    const loadingCopy = loadingScreen.querySelectorAll('.loading-logo, .loading-eyebrow, .loading-title, .loading-subtitle');
+
+    const loadingExit = gsap.timeline({
+        defaults: { ease: 'power3.in' },
+        onComplete: finish
+    });
+
+    loadingExit
+        .to(loadingTags, {
+            autoAlpha: 0,
+            y: 18,
+            rotation: 3,
+            duration: 0.65,
+            stagger: { each: 0.08, from: 'end' },
+            ease: 'expo.in'
+        }, 0)
+        .to(loadingBarContainer, {
+            autoAlpha: 0,
+            scaleX: 0.35,
+            duration: 0.7,
+            ease: 'power3.in'
+        }, 0.08)
+        .to(loadingCopy, {
+            autoAlpha: 0,
+            y: -18,
+            duration: 0.7,
+            stagger: { each: 0.06, from: 'end' },
+            ease: 'expo.in'
+        }, 0.12)
+        .to(loadingDecorations, {
+            autoAlpha: 0,
+            scale: 0.35,
+            rotation: 28,
+            duration: 0.72,
+            stagger: 0.08,
+            ease: 'power3.in'
+        }, 0.18)
+        .to(loadingContent, {
+            autoAlpha: 0,
+            y: -30,
+            rotation: 2,
+            scale: 0.96,
+            duration: 0.8,
+            ease: 'expo.in'
+        }, 0.3)
+        .to(loadingScreen, {
+            autoAlpha: 0,
+            y: -14,
+            duration: 0.75,
+            ease: 'expo.in'
+        }, 0.46);
+}
+
+initLoadingScreenMotion();
+initLenis();
+window.addEventListener('load', () => {
+    pageAssetsLoaded = true;
+    finishLoadingWhenReady();
 });
 
 // ====================================
@@ -745,6 +2180,91 @@ menuToggle.addEventListener('click', () => {
 // ====================================
 const themeToggle = document.getElementById('themeToggle');
 const body = document.body;
+const HERO_THEME_MOTION_PROPERTIES = [
+    '--hero-bg',
+    '--hero-ink',
+    '--hero-frame',
+    '--hero-video-filter',
+    '--hero-wash-start',
+    '--hero-wash-middle',
+    '--hero-wash-end',
+    '--hero-wash-top',
+    '--hero-wash-bottom',
+    '--hero-noise-line',
+    '--hero-grid-line',
+    '--hero-status',
+    '--hero-panel-bg',
+    '--hero-panel-ink',
+    '--hero-panel-border',
+    '--hero-panel-shadow',
+    '--hero-primary-bg',
+    '--hero-primary-ink',
+    '--hero-primary-border',
+    '--hero-primary-shadow',
+    '--hero-secondary-bg',
+    '--hero-secondary-ink',
+    '--hero-secondary-border',
+    '--hero-secondary-shadow',
+    '--hero-corner-bg',
+    '--hero-corner-ink',
+    '--hero-corner-border'
+];
+const CAMERA_THEME_MOTION_PROPERTIES = [
+    '--camera-bg',
+    '--camera-ink',
+    '--camera-grid',
+    '--camera-frame'
+];
+const ABOUT_THEME_MOTION_PROPERTIES = [
+    '--section-bg',
+    '--section-ink',
+    '--section-line',
+    '--section-panel',
+    '--section-panel-ink',
+    '--section-panel-line',
+    '--section-grid',
+    '--section-accent',
+    '--section-accent-alt'
+];
+
+function readHeroThemeMotionState(hero) {
+    const computed = getComputedStyle(hero);
+
+    return HERO_THEME_MOTION_PROPERTIES.reduce((state, property) => {
+        state[property] = computed.getPropertyValue(property).trim();
+        return state;
+    }, {});
+}
+
+function clearHeroThemeMotionState(hero) {
+    HERO_THEME_MOTION_PROPERTIES.forEach(property => hero.style.removeProperty(property));
+}
+
+function readCameraThemeMotionState(cameraSection) {
+    const computed = getComputedStyle(cameraSection);
+
+    return CAMERA_THEME_MOTION_PROPERTIES.reduce((state, property) => {
+        state[property] = computed.getPropertyValue(property).trim();
+        return state;
+    }, {});
+}
+
+function clearCameraThemeMotionState(cameraSection) {
+    CAMERA_THEME_MOTION_PROPERTIES.forEach(property => cameraSection.style.removeProperty(property));
+}
+
+function readAboutThemeMotionState(aboutSection) {
+    const computed = getComputedStyle(aboutSection);
+
+    return ABOUT_THEME_MOTION_PROPERTIES.reduce((state, property) => {
+        state[property] = computed.getPropertyValue(property).trim();
+        return state;
+    }, {});
+}
+
+function clearAboutThemeMotionState(aboutSection) {
+    ABOUT_THEME_MOTION_PROPERTIES.forEach(property => aboutSection.style.removeProperty(property));
+}
 
 // Verificar preferência salva ou preferência do sistema
 const savedTheme = localStorage.getItem('theme');
@@ -765,8 +2285,72 @@ syncThemeToggleState();
 
 // Toggle do tema
 themeToggle.addEventListener('click', () => {
+    const hero = document.querySelector('.section-hero');
+    const cameraSection = document.querySelector('.section-camera');
+    const aboutSection = document.querySelector('.section-sobre');
+    let previousHeroTheme = null;
+    let previousCameraTheme = null;
+    let previousAboutTheme = null;
+
+    if (hero && window.gsap) {
+        previousHeroTheme = readHeroThemeMotionState(hero);
+        gsap.killTweensOf(hero);
+        clearHeroThemeMotionState(hero);
+    }
+
+    if (cameraSection && window.gsap) {
+        previousCameraTheme = readCameraThemeMotionState(cameraSection);
+        gsap.killTweensOf(cameraSection);
+        clearCameraThemeMotionState(cameraSection);
+    }
+
+    if (aboutSection && window.gsap) {
+        previousAboutTheme = readAboutThemeMotionState(aboutSection);
+        gsap.killTweensOf(aboutSection);
+        clearAboutThemeMotionState(aboutSection);
+    }
+
     body.classList.toggle('dark-mode');
     syncThemeToggleState();
+
+    if (hero && previousHeroTheme && window.gsap) {
+        const nextHeroTheme = readHeroThemeMotionState(hero);
+
+        gsap.set(hero, previousHeroTheme);
+        gsap.to(hero, {
+            ...nextHeroTheme,
+            duration: 0.75,
+            ease: 'power3.out',
+            overwrite: 'auto',
+            onComplete: () => clearHeroThemeMotionState(hero)
+        });
+    }
+
+    if (cameraSection && previousCameraTheme && window.gsap) {
+        const nextCameraTheme = readCameraThemeMotionState(cameraSection);
+
+        gsap.set(cameraSection, previousCameraTheme);
+        gsap.to(cameraSection, {
+            ...nextCameraTheme,
+            duration: 0.75,
+            ease: 'power3.out',
+            overwrite: 'auto',
+            onComplete: () => clearCameraThemeMotionState(cameraSection)
+        });
+    }
+
+    if (aboutSection && previousAboutTheme && window.gsap) {
+        const nextAboutTheme = readAboutThemeMotionState(aboutSection);
+
+        gsap.set(aboutSection, previousAboutTheme);
+        gsap.to(aboutSection, {
+            ...nextAboutTheme,
+            duration: 0.75,
+            ease: 'power3.out',
+            overwrite: 'auto',
+            onComplete: () => clearAboutThemeMotionState(aboutSection)
+        });
+    }
     
     // Adicionar animação de pulso
     themeToggle.classList.add('pulse');

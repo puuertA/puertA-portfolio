@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script>document.documentElement.classList.add('site-booting');</script>
+    <script>document.documentElement.classList.add('site-booting', 'loading-motion-pending');</script>
     <title>Lucas - Desenvolvedor Full Stack</title>
     <meta name="description"
         content="Portfólio de Lucas Cano (@puertA): desenvolvimento full stack, segurança, interfaces e automação.">
@@ -26,7 +26,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="resources/favicons/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="192x192" href="resources/favicons/android-chrome-192x192.png">
     <link rel="icon" type="image/png" sizes="512x512" href="resources/favicons/android-chrome-512x512.png">
-    <link rel="stylesheet" href="styles.css?v=26">
+    <link rel="stylesheet" href="styles.css?v=32">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
@@ -40,22 +40,25 @@
     <!-- Loading Screen -->
     <div id="loadingScreen" class="loading-screen">
         <div class="loading-content">
+            <span class="loading-decor loading-decor-square" aria-hidden="true"></span>
+            <span class="loading-decor loading-decor-circle" aria-hidden="true"></span>
             <div class="loading-logo">
                 <img src="resources/logopuerta.png" alt="Logo" class="loading-logo-img">
             </div>
             <div class="loading-text">
+                <span class="loading-eyebrow">Portfolio / Full Stack</span>
                 <h2 class="loading-title"><span
                         style="color: #FF00FF; font-weight: 900; font-style: italic; text-transform: none;">puertA</span>
                 </h2>
-                <p class="loading-subtitle">Carregando portfólio...</p>
+                <p class="loading-subtitle">Preparando interface</p>
             </div>
             <div class="loading-bar-container">
                 <div class="loading-bar"></div>
             </div>
             <div class="loading-spinner">
-                <div class="spinner-dot"></div>
-                <div class="spinner-dot"></div>
-                <div class="spinner-dot"></div>
+                <div class="spinner-dot">UI</div>
+                <div class="spinner-dot">Dev</div>
+                <div class="spinner-dot">Security</div>
             </div>
         </div>
     </div>
@@ -106,8 +109,11 @@
         <video class="hero-video" autoplay muted loop playsinline webkit-playsinline preload="auto" aria-hidden="true" tabindex="-1">
             <source src="resources/hero-code.mp4?v=1" type="video/mp4">
         </video>
-        <div class="hero-video-wash" aria-hidden="true"></div>
+        <div class="hero-video-wash" aria-hidden="true">
+            <span class="hero-video-accent"></span>
+        </div>
         <div class="hero-noise" aria-hidden="true"></div>
+        <div class="hero-frame" aria-hidden="true"></div>
 
         <div class="container hero-stage">
             <div class="hero-prelude" aria-hidden="true">
@@ -153,7 +159,9 @@
     <!-- Processo com pin scroll -->
     <section class="section section-camera" id="processo" aria-labelledby="cameraTitle">
         <div class="camera-pin">
-            <div class="camera-grid" aria-hidden="true"></div>
+            <div class="camera-grid" aria-hidden="true">
+                <span class="camera-grid-glow"></span>
+            </div>
             <span class="camera-section-number" aria-hidden="true">02</span>
             <div class="camera-frame" aria-hidden="true">
                 <span class="camera-frame-corner camera-frame-tl"></span>
@@ -179,16 +187,19 @@
 
                 <div class="camera-cards">
                     <article class="camera-card camera-card-one camera-sequence-item">
+                        <span class="camera-card-shape" aria-hidden="true"></span>
                         <span class="camera-card-index">01</span>
                         <h3>Entender o problema</h3>
                         <p>O que precisa funcionar, para quem e por quê.</p>
                     </article>
                     <article class="camera-card camera-card-two camera-sequence-item">
+                        <span class="camera-card-shape" aria-hidden="true"></span>
                         <span class="camera-card-index">02</span>
                         <h3>Fazer funcionar</h3>
                         <p>Front-end, back-end e banco sem complicar o que é simples.</p>
                     </article>
                     <article class="camera-card camera-card-three camera-sequence-item">
+                        <span class="camera-card-shape" aria-hidden="true"></span>
                         <span class="camera-card-index">03</span>
                         <h3>Testar e entregar</h3>
                         <p>Reviso, corrijo e deixo pronto para uso.</p>
@@ -206,6 +217,8 @@
 
     <!-- Seção Sobre -->
     <section class="section section-sobre" id="sobre">
+        <div class="section-sobre-grid" aria-hidden="true"></div>
+        <span class="section-sobre-number" aria-hidden="true">03</span>
         <div class="container">
             <header class="section-masthead">
                 <span class="section-index">03 / SOBRE</span>
@@ -222,6 +235,8 @@
                         <span class="photo-decor photo-decor-api">API / WEB</span>
                     </div>
                     <div class="sobre-image">
+                        <span class="sobre-image-label" aria-hidden="true">LUCAS / 01</span>
+                        <span class="sobre-image-corner" aria-hidden="true"></span>
                         <img src="resources/fotolucas.png" alt="Foto de Lucas">
                     </div>
                 </div>
@@ -296,6 +311,8 @@
 
     <!-- Seção Projetos -->
     <section class="section section-projetos" id="projetos">
+        <div class="section-projetos-grid" aria-hidden="true"></div>
+        <span class="section-projetos-number" aria-hidden="true">04</span>
         <div class="container">
             <header class="section-masthead">
                 <span class="section-index">04 / PROJETOS</span>
@@ -438,14 +455,14 @@
 
     <!-- Lightbox -->
     <div id="lightbox" class="lightbox" onclick="closeLightbox()">
-        <button class="lightbox-close" onclick="closeLightbox()" aria-label="Fechar">×</button>
-        <img id="lightboxImage" class="lightbox-content" src="" alt="">
+        <button class="lightbox-close" onclick="event.stopPropagation(); closeLightbox()" aria-label="Fechar">×</button>
+        <img id="lightboxImage" class="lightbox-content" src="" alt="" onclick="event.stopPropagation()">
     </div>
 
     <script src="https://unpkg.com/lenis@1.3.8/dist/lenis.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-    <script src="script.js?v=22"></script>
+    <script src="script.js?v=29"></script>
 </body>
 
 </html>
