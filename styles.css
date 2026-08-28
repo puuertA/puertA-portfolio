@@ -3296,11 +3296,12 @@ body:not(.gsap-ready) .project-card.active {
     --hero-ink: #111111;
     --hero-frame: rgba(17, 17, 17, 0.82);
     --hero-video-filter: grayscale(1) contrast(1.12) brightness(1.18);
-    --hero-wash-start: rgba(243, 240, 231, 0.94);
-    --hero-wash-middle: rgba(243, 240, 231, 0.5);
-    --hero-wash-end: rgba(243, 240, 231, 0.82);
-    --hero-wash-top: rgba(243, 240, 231, 0.74);
-    --hero-wash-bottom: rgba(243, 240, 231, 0.9);
+    --hero-wash-start: rgba(243, 240, 231, 0.98);
+    --hero-wash-middle: rgba(243, 240, 231, 0.84);
+    --hero-wash-end: rgba(243, 240, 231, 0.96);
+    --hero-wash-top: rgba(243, 240, 231, 0.94);
+    --hero-wash-bottom: rgba(243, 240, 231, 0.98);
+    --hero-wash-base: rgba(243, 240, 231, 0.36);
     --hero-accent-blend: multiply;
     --hero-noise-line: rgba(17, 17, 17, 0.09);
     --hero-grid-line: rgba(17, 17, 17, 0.12);
@@ -3342,6 +3343,7 @@ body.dark-mode .fullscreen-hero.section-hero {
     --hero-wash-end: rgba(12, 12, 12, 0.62);
     --hero-wash-top: rgba(12, 12, 12, 0.68);
     --hero-wash-bottom: rgba(12, 12, 12, 0.7);
+    --hero-wash-base: rgba(12, 12, 12, 0.08);
     --hero-accent-blend: screen;
     --hero-noise-line: rgba(255, 255, 255, 0.1);
     --hero-grid-line: rgba(255, 255, 255, 0.07);
@@ -3401,7 +3403,8 @@ body.dark-mode .fullscreen-hero.section-hero {
     z-index: -3;
     background:
         linear-gradient(90deg, var(--hero-wash-start) 0%, var(--hero-wash-middle) 58%, var(--hero-wash-end) 100%),
-        linear-gradient(180deg, var(--hero-wash-top) 0%, transparent 34%, var(--hero-wash-bottom) 100%);
+        linear-gradient(180deg, var(--hero-wash-top) 0%, transparent 34%, var(--hero-wash-bottom) 100%),
+        linear-gradient(var(--hero-wash-base), var(--hero-wash-base));
 }
 
 .hero-video-accent {
@@ -4759,12 +4762,14 @@ body.dark-mode .section-contato {
 
 .section-sobre .sobre-grid {
     grid-template-columns: minmax(280px, 0.68fr) minmax(0, 1.32fr);
-    gap: clamp(2rem, 5vw, 5rem);
+    column-gap: clamp(2rem, 5vw, 5rem);
+    row-gap: clamp(2.5rem, 5vw, 4.5rem);
     align-items: start;
 }
 
 .section-sobre .sobre-image-wrapper {
-    top: 7rem;
+    position: relative;
+    top: auto;
     isolation: isolate;
     overflow: visible;
     cursor: crosshair;
@@ -5009,9 +5014,17 @@ body.photo-motion-ready .section-sobre .sobre-image-wrapper:active .sobre-image 
 }
 
 .sobre-academic {
-    margin-top: clamp(1.5rem, 3vw, 2.5rem);
-    padding-top: clamp(1.25rem, 2.5vw, 2rem);
-    border-top: 4px solid var(--section-panel-line);
+    grid-column: 1 / -1;
+    width: 100%;
+    margin: 0;
+    padding: clamp(1.5rem, 3vw, 2.75rem);
+    position: relative;
+    z-index: 2;
+    color: var(--section-panel-ink);
+    background: var(--section-panel);
+    border: 4px solid var(--section-panel-line);
+    box-shadow: 12px 12px 0 var(--section-accent-alt);
+    overflow: hidden;
 }
 
 .academic-header {
@@ -5290,7 +5303,7 @@ body.about-motion-ready .section-sobre .btn-primary:hover {
 
 .section-projetos .tag {
     padding: 0.45rem 0.65rem;
-    border: 2px solid #111111;
+    border: 2px solid var(--section-panel-line);
     font-family: 'Courier New', monospace;
     font-size: 0.65rem;
     font-weight: 900;
@@ -5799,6 +5812,12 @@ body.dark-mode .footer {
 
     .section-sobre .sobre-card {
         box-shadow: 8px 8px 0 var(--section-accent);
+    }
+
+    .section-sobre .sobre-academic {
+        grid-column: 1;
+        padding: clamp(1rem, 4.5vw, 1.5rem);
+        box-shadow: 8px 8px 0 var(--section-accent-alt);
     }
 
     .sobre-card-footer {

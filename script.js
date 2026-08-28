@@ -73,6 +73,10 @@ function animatePageIntro() {
         paused: true,
         defaults: { ease: 'power3.out' },
         onComplete: () => {
+            // O wash define o contraste do tema e precisa permanecer totalmente
+            // visível depois do reveal. A timeline de scroll não deve capturar o
+            // estado opacity: 0 usado somente durante o loading.
+            gsap.set('.hero-video-wash', { autoAlpha: 1 });
             document.body.classList.add('hero-intro-complete');
             if (window.scrollY > 24) {
                 gsap.set('.hero-scroll-indicator', { autoAlpha: 0, y: 20 });
@@ -730,18 +734,15 @@ function addProjectCardReveal(timeline, card, startAt = 0) {
     if (!timeline || !card) return;
 
     const infoIcon = card.querySelector('.project-info-icon');
-    const header = card.querySelector('.project-header');
     const count = card.querySelector('.project-count');
     const title = card.querySelector('.project-title');
     const status = card.querySelector('.project-status-badge');
     const tags = card.querySelectorAll('.project-tags .tag');
-    const content = card.querySelector('.project-content');
     const description = card.querySelector('.project-description');
     const projectNumber = card.querySelector('.project-number-display');
     const gallery = card.querySelector('.project-gallery-carousel');
     const galleryImage = card.querySelector('.gallery-item.active .gallery-image');
     const galleryControls = card.querySelectorAll('.gallery-nav, .gallery-dot');
-    const buttonsContainer = card.querySelector('.project-buttons');
     const buttons = card.querySelectorAll('.project-buttons .btn');
 
     if (infoIcon) {
@@ -758,19 +759,6 @@ function addProjectCardReveal(timeline, card, startAt = 0) {
         );
     }
 
-    if (header) {
-        timeline.fromTo(header,
-            { autoAlpha: 0, y: 28 },
-            {
-                autoAlpha: 1,
-                y: 0,
-                duration: 0.82,
-                ease: 'power3.out'
-            },
-            startAt
-        );
-    }
-
     if (count) {
         timeline.fromTo(count,
             { autoAlpha: 0, x: -22 },
@@ -780,7 +768,7 @@ function addProjectCardReveal(timeline, card, startAt = 0) {
                 duration: 0.68,
                 ease: 'expo.out'
             },
-            startAt + 0.08
+            startAt
         );
     }
 
@@ -794,7 +782,7 @@ function addProjectCardReveal(timeline, card, startAt = 0) {
                 duration: 0.9,
                 ease: 'expo.out'
             },
-            startAt + 0.12
+            startAt + 0.14
         );
     }
 
@@ -808,7 +796,7 @@ function addProjectCardReveal(timeline, card, startAt = 0) {
                 duration: 0.72,
                 ease: 'power3.out'
             },
-            startAt + 0.2
+            startAt + 0.26
         );
     }
 
@@ -824,33 +812,21 @@ function addProjectCardReveal(timeline, card, startAt = 0) {
                 stagger: 0.08,
                 ease: 'expo.out'
             },
-            startAt + 0.28
-        );
-    }
-
-    if (content) {
-        timeline.fromTo(content,
-            { autoAlpha: 0, y: 34 },
-            {
-                autoAlpha: 1,
-                y: 0,
-                duration: 0.86,
-                ease: 'power3.out'
-            },
-            startAt + 0.42
+            startAt + 0.34
         );
     }
 
     if (description) {
         timeline.fromTo(description,
-            { autoAlpha: 0, x: -26 },
+            { autoAlpha: 0, x: -32, clipPath: 'inset(0 100% 0 0)' },
             {
                 autoAlpha: 1,
                 x: 0,
+                clipPath: 'inset(0 0% 0 0)',
                 duration: 0.78,
                 ease: 'expo.out'
             },
-            startAt + 0.5
+            startAt + 0.62
         );
     }
 
@@ -866,22 +842,29 @@ function addProjectCardReveal(timeline, card, startAt = 0) {
                 duration: 1,
                 ease: 'expo.out'
             },
-            startAt + 0.54
+            startAt + 0.78
         );
     }
 
     if (gallery) {
         timeline.fromTo(gallery,
-            { autoAlpha: 0, x: 38, rotation: 1.5, scale: 0.96 },
+            {
+                autoAlpha: 0,
+                x: 42,
+                rotation: 1.5,
+                scale: 0.96,
+                clipPath: 'inset(0 100% 0 0)'
+            },
             {
                 autoAlpha: 1,
                 x: 0,
                 rotation: 0,
                 scale: 1,
+                clipPath: 'inset(0 0% 0 0)',
                 duration: 0.9,
                 ease: 'expo.out'
             },
-            startAt + 0.5
+            startAt + 0.72
         );
     }
 
@@ -894,7 +877,7 @@ function addProjectCardReveal(timeline, card, startAt = 0) {
                 duration: 0.85,
                 ease: 'power3.out'
             },
-            startAt + 0.64
+            startAt + 0.86
         );
     }
 
@@ -910,20 +893,7 @@ function addProjectCardReveal(timeline, card, startAt = 0) {
                 stagger: 0.08,
                 ease: 'expo.out'
             },
-            startAt + 0.72
-        );
-    }
-
-    if (buttonsContainer) {
-        timeline.fromTo(buttonsContainer,
-            { autoAlpha: 0, y: 24 },
-            {
-                autoAlpha: 1,
-                y: 0,
-                duration: 0.76,
-                ease: 'power3.out'
-            },
-            startAt + 0.76
+            startAt + 1.02
         );
     }
 
@@ -938,9 +908,256 @@ function addProjectCardReveal(timeline, card, startAt = 0) {
                 stagger: 0.1,
                 ease: 'expo.out'
             },
-            startAt + 0.84
+            startAt + 1.12
         );
     }
+}
+
+function resetProjectCardChangeState(card) {
+    if (!card || !window.gsap) return;
+
+    if (projectRevealFrame !== null) {
+        cancelAnimationFrame(projectRevealFrame);
+        projectRevealFrame = null;
+    }
+
+    if (activeProjectRevealTimeline) {
+        activeProjectRevealTimeline.kill();
+        activeProjectRevealTimeline = null;
+    }
+
+    const motionTargets = [
+        card,
+        ...card.querySelectorAll([
+            '.project-info-icon',
+            '.project-count',
+            '.project-title',
+            '.project-status-badge',
+            '.project-tags .tag',
+            '.project-description',
+            '.project-number-display',
+            '.project-gallery-carousel',
+            '.gallery-item.active .gallery-image',
+            '.gallery-nav',
+            '.gallery-dot',
+            '.project-buttons .btn'
+        ].join(','))
+    ];
+
+    gsap.killTweensOf(motionTargets);
+    gsap.set(motionTargets, {
+        clearProps: 'opacity,visibility,transform,clipPath,boxShadow'
+    });
+}
+
+function animateProjectCardChangeReveal(card, direction = 1) {
+    if (!card || !window.gsap) {
+        projectTransitioning = false;
+        return;
+    }
+
+    const infoIcon = card.querySelector('.project-info-icon');
+    const count = card.querySelector('.project-count');
+    const title = card.querySelector('.project-title');
+    const status = card.querySelector('.project-status-badge');
+    const tags = card.querySelectorAll('.project-tags .tag');
+    const description = card.querySelector('.project-description');
+    const projectNumber = card.querySelector('.project-number-display');
+    const gallery = card.querySelector('.project-gallery-carousel');
+    const galleryImage = card.querySelector('.gallery-item.active .gallery-image');
+    const galleryControls = card.querySelectorAll('.gallery-nav, .gallery-dot');
+    const buttons = card.querySelectorAll('.project-buttons .btn');
+    const animatedTargets = [
+        infoIcon,
+        count,
+        title,
+        status,
+        ...tags,
+        description,
+        projectNumber,
+        gallery,
+        galleryImage,
+        ...galleryControls,
+        ...buttons
+    ].filter(Boolean);
+
+    gsap.killTweensOf([card, ...animatedTargets]);
+
+    // Estes estados são aplicados depois que o card já recebeu .active.
+    // A timeline só começa no próximo frame, evitando o conteúdo pronto piscar.
+    gsap.set(card, {
+        autoAlpha: 1,
+        x: direction * 52,
+        y: 18,
+        rotation: direction * 1.6,
+        scale: 0.955
+    });
+
+    if (count) gsap.set(count, { autoAlpha: 0, x: direction * -26 });
+    if (title) gsap.set(title, { autoAlpha: 0, y: 38, clipPath: 'inset(0 0 100% 0)' });
+    if (infoIcon) gsap.set(infoIcon, { autoAlpha: 0, x: 24, scale: 0.55, rotation: -18 });
+    if (status) gsap.set(status, { autoAlpha: 0, x: 32, rotation: 4 });
+    if (tags.length) gsap.set(tags, { autoAlpha: 0, y: 22, rotation: -4, scale: 0.86 });
+    if (description) {
+        gsap.set(description, {
+            autoAlpha: 0,
+            x: direction * -38,
+            clipPath: 'inset(0 100% 0 0)'
+        });
+    }
+    if (projectNumber) {
+        gsap.set(projectNumber, {
+            autoAlpha: 0,
+            x: direction * 54,
+            y: 34,
+            rotation: direction * 5,
+            scale: 0.78
+        });
+    }
+    if (gallery) {
+        gsap.set(gallery, {
+            autoAlpha: 0,
+            x: direction * 48,
+            rotation: direction * 1.8,
+            scale: 0.95,
+            clipPath: direction > 0 ? 'inset(0 100% 0 0)' : 'inset(0 0 0 100%)'
+        });
+    }
+    if (galleryImage) gsap.set(galleryImage, { autoAlpha: 0, scale: 1.1 });
+    if (galleryControls.length) {
+        gsap.set(galleryControls, { autoAlpha: 0, y: 16, rotation: -6, scale: 0.8 });
+    }
+    if (buttons.length) gsap.set(buttons, { autoAlpha: 0, y: 22, rotation: -3, scale: 0.94 });
+
+    const revealTimeline = gsap.timeline({
+        paused: true,
+        defaults: { ease: 'power3.out' },
+        onComplete: () => {
+            gsap.set(card, { clearProps: 'opacity,visibility,transform,boxShadow' });
+            activeProjectRevealTimeline = null;
+            projectTransitioning = false;
+        }
+    });
+
+    activeProjectRevealTimeline = revealTimeline;
+
+    revealTimeline.to(card, {
+        x: 0,
+        y: 0,
+        rotation: 0,
+        scale: 1,
+        duration: 0.92,
+        ease: 'expo.out'
+    }, 0);
+
+    if (count) {
+        revealTimeline.to(count, { autoAlpha: 1, x: 0, duration: 0.68, ease: 'expo.out' }, 0.08);
+    }
+    if (title) {
+        revealTimeline.to(title, {
+            autoAlpha: 1,
+            y: 0,
+            clipPath: 'inset(0 0 0% 0)',
+            duration: 0.9,
+            ease: 'expo.out'
+        }, 0.18);
+    }
+    if (infoIcon) {
+        revealTimeline.to(infoIcon, {
+            autoAlpha: 1,
+            x: 0,
+            scale: 1,
+            rotation: 0,
+            duration: 0.7,
+            ease: 'expo.out'
+        }, 0.26);
+    }
+    if (status) {
+        revealTimeline.to(status, {
+            autoAlpha: 1,
+            x: 0,
+            rotation: 0,
+            duration: 0.72,
+            ease: 'power3.out'
+        }, 0.34);
+    }
+    if (tags.length) {
+        revealTimeline.to(tags, {
+            autoAlpha: 1,
+            y: 0,
+            rotation: 0,
+            scale: 1,
+            duration: 0.7,
+            stagger: 0.08,
+            ease: 'expo.out'
+        }, 0.42);
+    }
+    if (description) {
+        revealTimeline.to(description, {
+            autoAlpha: 1,
+            x: 0,
+            clipPath: 'inset(0 0% 0 0)',
+            duration: 0.82,
+            ease: 'expo.out'
+        }, 0.72);
+    }
+    if (gallery) {
+        revealTimeline.to(gallery, {
+            autoAlpha: 1,
+            x: 0,
+            rotation: 0,
+            scale: 1,
+            clipPath: 'inset(0 0% 0 0)',
+            duration: 0.92,
+            ease: 'expo.out'
+        }, 0.84);
+    }
+    if (projectNumber) {
+        revealTimeline.to(projectNumber, {
+            autoAlpha: 0.18,
+            x: 0,
+            y: 0,
+            rotation: 0,
+            scale: 1,
+            duration: 1,
+            ease: 'expo.out'
+        }, 0.92);
+    }
+    if (galleryImage) {
+        revealTimeline.to(galleryImage, {
+            autoAlpha: 1,
+            scale: 1,
+            duration: 0.85,
+            ease: 'power3.out'
+        }, 1.02);
+    }
+    if (galleryControls.length) {
+        revealTimeline.to(galleryControls, {
+            autoAlpha: 1,
+            y: 0,
+            rotation: 0,
+            scale: 1,
+            duration: 0.7,
+            stagger: 0.08,
+            ease: 'expo.out'
+        }, 1.18);
+    }
+    if (buttons.length) {
+        revealTimeline.to(buttons, {
+            autoAlpha: 1,
+            y: 0,
+            rotation: 0,
+            scale: 1,
+            duration: 0.7,
+            stagger: 0.1,
+            ease: 'expo.out'
+        }, 1.3);
+    }
+
+    projectRevealFrame = requestAnimationFrame(() => {
+        projectRevealFrame = null;
+        revealTimeline.play(0);
+    });
 }
 
 function initProjectSectionAnimations() {
@@ -949,8 +1166,6 @@ function initProjectSectionAnimations() {
 
     if (!section || !cards.length || !window.gsap || !window.ScrollTrigger) return;
     if (section.dataset.motionBound === 'true') return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
     section.dataset.motionBound = 'true';
     document.body.classList.add('project-motion-ready');
 
@@ -1122,6 +1337,7 @@ function initProjectInteractiveMotion(section) {
                 });
             },
             () => {
+                if (projectTransitioning) return;
                 const accent = getComputedStyle(section).getPropertyValue('--section-accent-alt').trim();
                 gsap.to(card, {
                     x: 0,
@@ -1523,11 +1739,6 @@ function initScrollAnimations() {
             autoAlpha: 0.22,
             scaleX: 0.98,
             scaleY: 0.98,
-            duration: 1.1,
-            ease: 'power3.inOut'
-        }, 0)
-        .to('.hero-video-wash', {
-            opacity: 0.62,
             duration: 1.1,
             ease: 'power3.inOut'
         }, 0)
@@ -2190,6 +2401,7 @@ const HERO_THEME_MOTION_PROPERTIES = [
     '--hero-wash-end',
     '--hero-wash-top',
     '--hero-wash-bottom',
+    '--hero-wash-base',
     '--hero-noise-line',
     '--hero-grid-line',
     '--hero-status',
@@ -2226,6 +2438,7 @@ const ABOUT_THEME_MOTION_PROPERTIES = [
     '--section-accent',
     '--section-accent-alt'
 ];
+const PROJECTS_THEME_MOTION_PROPERTIES = [...ABOUT_THEME_MOTION_PROPERTIES];
 
 function readHeroThemeMotionState(hero) {
     const computed = getComputedStyle(hero);
@@ -2266,6 +2479,19 @@ function clearAboutThemeMotionState(aboutSection) {
     ABOUT_THEME_MOTION_PROPERTIES.forEach(property => aboutSection.style.removeProperty(property));
 }
 
+function readProjectsThemeMotionState(projectsSection) {
+    const computed = getComputedStyle(projectsSection);
+
+    return PROJECTS_THEME_MOTION_PROPERTIES.reduce((state, property) => {
+        state[property] = computed.getPropertyValue(property).trim();
+        return state;
+    }, {});
+}
+
+function clearProjectsThemeMotionState(projectsSection) {
+    PROJECTS_THEME_MOTION_PROPERTIES.forEach(property => projectsSection.style.removeProperty(property));
+}
+
 // Verificar preferência salva ou preferência do sistema
 const savedTheme = localStorage.getItem('theme');
 const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -2288,9 +2514,11 @@ themeToggle.addEventListener('click', () => {
     const hero = document.querySelector('.section-hero');
     const cameraSection = document.querySelector('.section-camera');
     const aboutSection = document.querySelector('.section-sobre');
+    const projectsSection = document.querySelector('.section-projetos');
     let previousHeroTheme = null;
     let previousCameraTheme = null;
     let previousAboutTheme = null;
+    let previousProjectsTheme = null;
 
     if (hero && window.gsap) {
         previousHeroTheme = readHeroThemeMotionState(hero);
@@ -2308,6 +2536,12 @@ themeToggle.addEventListener('click', () => {
         previousAboutTheme = readAboutThemeMotionState(aboutSection);
         gsap.killTweensOf(aboutSection);
         clearAboutThemeMotionState(aboutSection);
+    }
+
+    if (projectsSection && window.gsap) {
+        previousProjectsTheme = readProjectsThemeMotionState(projectsSection);
+        gsap.killTweensOf(projectsSection);
+        clearProjectsThemeMotionState(projectsSection);
     }
 
     body.classList.toggle('dark-mode');
@@ -2349,6 +2583,19 @@ themeToggle.addEventListener('click', () => {
             ease: 'power3.out',
             overwrite: 'auto',
             onComplete: () => clearAboutThemeMotionState(aboutSection)
+        });
+    }
+
+    if (projectsSection && previousProjectsTheme && window.gsap) {
+        const nextProjectsTheme = readProjectsThemeMotionState(projectsSection);
+
+        gsap.set(projectsSection, previousProjectsTheme);
+        gsap.to(projectsSection, {
+            ...nextProjectsTheme,
+            duration: 0.75,
+            ease: 'power3.out',
+            overwrite: 'auto',
+            onComplete: () => clearProjectsThemeMotionState(projectsSection)
         });
     }
     
@@ -2710,68 +2957,204 @@ if (footerYear) {
 // ====================================
 // Carousel de Galeria do Projeto
 // ====================================
-function changeSlide(direction, button) {
-    const carousel = button.closest('.project-gallery-carousel');
-    const slides = carousel.querySelectorAll('.gallery-item');
-    const dots = carousel.querySelectorAll('.gallery-dot');
-    let currentIndex = 0;
-    
-    // Encontrar slide atual
-    slides.forEach((slide, index) => {
-        if (slide.classList.contains('active')) {
-            currentIndex = index;
+function transitionGallerySlide(carousel, newIndex, direction = 1) {
+    if (!carousel || carousel.dataset.sliding === 'true') return;
+
+    const slides = Array.from(carousel.querySelectorAll('.gallery-item'));
+    const dots = Array.from(carousel.querySelectorAll('.gallery-dot'));
+    const currentIndex = slides.findIndex(slide => slide.classList.contains('active'));
+
+    if (currentIndex < 0 || !slides[newIndex] || newIndex === currentIndex) return;
+
+    const outgoing = slides[currentIndex];
+    const incoming = slides[newIndex];
+    const incomingDot = dots[newIndex];
+    const canAnimate = window.gsap
+        && document.body.classList.contains('project-motion-ready');
+
+    dots.forEach((dot, index) => dot.classList.toggle('active', index === newIndex));
+
+    if (!canAnimate) {
+        outgoing.classList.remove('active');
+        incoming.classList.add('active');
+        return;
+    }
+
+    carousel.dataset.sliding = 'true';
+    incoming.classList.add('active');
+    gsap.set(incoming, {
+        autoAlpha: 0,
+        xPercent: direction * 8,
+        scale: 1.035,
+        zIndex: 2,
+        pointerEvents: 'none'
+    });
+    gsap.set(outgoing, { zIndex: 1, pointerEvents: 'none' });
+
+    const slideTimeline = gsap.timeline({
+        defaults: { ease: 'power3.out' },
+        onComplete: () => {
+            outgoing.classList.remove('active');
+            gsap.set(outgoing, { clearProps: 'opacity,visibility,transform,zIndex,pointerEvents' });
+            gsap.set(incoming, { clearProps: 'opacity,visibility,transform,zIndex,pointerEvents' });
+            delete carousel.dataset.sliding;
         }
     });
-    
-    // Remover active do slide e dot atual
-    slides[currentIndex].classList.remove('active');
-    dots[currentIndex].classList.remove('active');
-    
-    // Calcular novo índice
+
+    slideTimeline
+        .to(outgoing, {
+            autoAlpha: 0,
+            xPercent: direction * -6,
+            scale: 0.985,
+            duration: 0.68,
+            ease: 'expo.inOut'
+        }, 0)
+        .to(incoming, {
+            autoAlpha: 1,
+            xPercent: 0,
+            scale: 1,
+            duration: 0.82,
+            ease: 'expo.out'
+        }, 0.18);
+
+    if (incomingDot) {
+        slideTimeline.fromTo(incomingDot,
+            { scale: 0.72, rotation: -14 },
+            { scale: 1, rotation: 0, duration: 0.65, ease: 'expo.out' },
+            0.24
+        );
+    }
+}
+
+function changeSlide(direction, button) {
+    const carousel = button.closest('.project-gallery-carousel');
+    const slides = carousel ? carousel.querySelectorAll('.gallery-item') : [];
+    const currentIndex = Array.from(slides).findIndex(slide => slide.classList.contains('active'));
+
+    if (!carousel || !slides.length || currentIndex < 0) return;
+
     let newIndex = currentIndex + direction;
     if (newIndex >= slides.length) newIndex = 0;
     if (newIndex < 0) newIndex = slides.length - 1;
-    
-    // Adicionar active ao novo slide e dot
-    slides[newIndex].classList.add('active');
-    dots[newIndex].classList.add('active');
+
+    transitionGallerySlide(carousel, newIndex, direction);
 }
 
 function setSlide(index, dot) {
     const carousel = dot.closest('.project-gallery-carousel');
-    const slides = carousel.querySelectorAll('.gallery-item');
-    const dots = carousel.querySelectorAll('.gallery-dot');
-    
-    // Remover active de todos
-    slides.forEach(slide => slide.classList.remove('active'));
-    dots.forEach(d => d.classList.remove('active'));
-    
-    // Adicionar active ao selecionado
-    slides[index].classList.add('active');
-    dots[index].classList.add('active');
+    const slides = carousel ? Array.from(carousel.querySelectorAll('.gallery-item')) : [];
+    const currentIndex = slides.findIndex(slide => slide.classList.contains('active'));
+
+    if (!carousel || currentIndex < 0) return;
+
+    transitionGallerySlide(carousel, index, index >= currentIndex ? 1 : -1);
 }
 
 // ====================================
 // Lightbox para Imagens
 // ====================================
+let lightboxTransitioning = false;
+
 function openLightbox(src, alt) {
     const lightbox = document.getElementById('lightbox');
     const lightboxImage = document.getElementById('lightboxImage');
+    const closeButton = lightbox?.querySelector('.lightbox-close');
+
+    if (!lightbox || !lightboxImage || lightboxTransitioning) return;
     
     lightboxImage.src = src;
     lightboxImage.alt = alt;
     lightbox.classList.add('active');
-    
-    // Prevenir scroll do body
     document.body.style.overflow = 'hidden';
+
+    if (!window.gsap || !document.body.classList.contains('project-motion-ready')) return;
+
+    lightboxTransitioning = true;
+    gsap.set(lightbox, { autoAlpha: 0 });
+
+    const lightboxTimeline = gsap.timeline({
+        defaults: { ease: 'power3.out' },
+        onComplete: () => {
+            lightboxTransitioning = false;
+        }
+    });
+
+    lightboxTimeline
+        .to(lightbox, { autoAlpha: 1, duration: 0.72, ease: 'expo.out' }, 0)
+        .fromTo(lightboxImage,
+            { autoAlpha: 0, y: 34, rotation: -1.5, scale: 0.93 },
+            {
+                autoAlpha: 1,
+                y: 0,
+                rotation: 0,
+                scale: 1,
+                duration: 0.9,
+                ease: 'expo.out'
+            },
+            0.08
+        );
+
+    if (closeButton) {
+        lightboxTimeline.fromTo(closeButton,
+            { autoAlpha: 0, x: 24, y: -24, rotation: 12, scale: 0.78 },
+            {
+                autoAlpha: 1,
+                x: 0,
+                y: 0,
+                rotation: 0,
+                scale: 1,
+                duration: 0.72,
+                ease: 'expo.out'
+            },
+            0.18
+        );
+    }
 }
 
 function closeLightbox() {
     const lightbox = document.getElementById('lightbox');
-    lightbox.classList.remove('active');
-    
-    // Restaurar scroll do body
-    document.body.style.overflow = '';
+    const lightboxImage = document.getElementById('lightboxImage');
+    const closeButton = lightbox?.querySelector('.lightbox-close');
+
+    if (!lightbox || !lightbox.classList.contains('active') || lightboxTransitioning) return;
+
+    if (!window.gsap || !document.body.classList.contains('project-motion-ready')) {
+        lightbox.classList.remove('active');
+        document.body.style.overflow = '';
+        return;
+    }
+
+    lightboxTransitioning = true;
+
+    const lightboxTimeline = gsap.timeline({
+        defaults: { ease: 'expo.inOut' },
+        onComplete: () => {
+            lightbox.classList.remove('active');
+            gsap.set([lightbox, lightboxImage, closeButton], { clearProps: 'opacity,visibility,transform' });
+            document.body.style.overflow = '';
+            lightboxTransitioning = false;
+        }
+    });
+
+    if (closeButton) {
+        lightboxTimeline.to(closeButton, {
+            autoAlpha: 0,
+            x: 20,
+            y: -20,
+            rotation: 10,
+            duration: 0.65
+        }, 0);
+    }
+
+    lightboxTimeline
+        .to(lightboxImage, {
+            autoAlpha: 0,
+            y: 28,
+            rotation: 1.2,
+            scale: 0.95,
+            duration: 0.72
+        }, 0)
+        .to(lightbox, { autoAlpha: 0, duration: 0.72 }, 0.08);
 }
 
 // Fechar com tecla ESC
@@ -2786,6 +3169,9 @@ document.addEventListener('keydown', (e) => {
 // ====================================
 let currentProjectIndex = 0;
 let projectsData = [];
+let projectTransitioning = false;
+let activeProjectRevealTimeline = null;
+let projectRevealFrame = null;
 
 // Carregar projetos do JSON
 async function loadProjects() {
@@ -2793,8 +3179,16 @@ async function loadProjects() {
         const response = await fetch('projects.json');
         const data = await response.json();
         projectsData = data.projects;
+        currentProjectIndex = 0;
         renderProjects();
         renderIndicators();
+
+        if (motionStarted) {
+            initProjectSectionAnimations();
+            if (window.ScrollTrigger) {
+                requestAnimationFrame(() => ScrollTrigger.refresh());
+            }
+        }
     } catch (error) {
         console.error('Erro ao carregar projetos:', error);
     }
@@ -2813,7 +3207,7 @@ function renderProjects() {
         
         // Renderizar tags
         const tagsHTML = project.tags.map(tag => 
-            `<span class="tag ${tag.class}">${tag.name}</span>`
+            `<span class="tag ${tag.class}"><span class="tag-mark" aria-hidden="true">◆</span><span class="tag-label">${tag.name}</span></span>`
         ).join('');
         
         // Renderizar galeria de imagens (se houver)
@@ -2845,11 +3239,13 @@ function renderProjects() {
         
         // Renderizar botões
         const buttonsHTML = project.buttons.map(btn => {
+            const buttonContent = `<span class="project-button-label">${btn.text}</span><span class="project-button-arrow" aria-hidden="true">→</span>`;
+
             if (btn.url) {
                 const target = btn.target ? `target="${btn.target}"` : '';
-                return `<a href="${btn.url}" ${target} class="btn ${btn.class}">${btn.text}</a>`;
+                return `<a href="${btn.url}" ${target} class="btn ${btn.class}">${buttonContent}</a>`;
             } else if (btn.onclick) {
-                return `<button class="btn ${btn.class}" onclick="${btn.onclick}">${btn.text}</button>`;
+                return `<button class="btn ${btn.class}" onclick="${btn.onclick}">${buttonContent}</button>`;
             }
             return '';
         }).join('');
@@ -2901,48 +3297,67 @@ function renderProjects() {
 function renderIndicators() {
     const indicators = document.getElementById('projectIndicators');
     if (!indicators) return;
+
+    const sectionNote = document.querySelector('.section-projetos .section-note');
+    const total = String(projectsData.length).padStart(2, '0');
+
+    indicators.style.setProperty('--project-count', String(projectsData.length));
+    if (sectionNote) sectionNote.textContent = `SELEÇÃO / ${total}`;
     
     indicators.innerHTML = projectsData.map((project, index) =>
         `<button type="button" class="project-indicator ${index === 0 ? 'active' : ''}" onclick="setProject(${index})" aria-label="Abrir projeto ${project.title}">${String(index + 1).padStart(2, '0')}</button>`
     ).join('');
 }
 
+function transitionToProject(newIndex, direction = 1) {
+    const projects = Array.from(document.querySelectorAll('.project-card'));
+    const section = document.querySelector('.section-projetos');
+
+    if (!projects.length || !projects[newIndex] || newIndex === currentProjectIndex) return;
+
+    if (window.gsap && section && !document.body.classList.contains('project-motion-ready')) {
+        document.body.classList.add('project-motion-ready');
+        initProjectInteractiveMotion(section);
+    }
+
+    const outgoing = projects[currentProjectIndex];
+    const incoming = projects[newIndex];
+    const canAnimate = window.gsap
+        && document.body.classList.contains('project-motion-ready');
+
+    if (!canAnimate) {
+        outgoing.classList.remove('active');
+        incoming.classList.add('active');
+        currentProjectIndex = newIndex;
+        syncProjectIndicators(newIndex, false);
+        return;
+    }
+
+    projectTransitioning = true;
+    resetProjectCardChangeState(outgoing);
+    resetProjectCardChangeState(incoming);
+
+    outgoing.classList.remove('active');
+    incoming.classList.add('active');
+    currentProjectIndex = newIndex;
+    syncProjectIndicators(newIndex, true);
+    animateProjectCardChangeReveal(incoming, direction);
+}
+
 function changeProject(direction) {
     const projects = document.querySelectorAll('.project-card');
-    const indicators = document.querySelectorAll('.project-indicator');
-    
-    if (projects.length === 0) return;
-    
-    // Remover active do projeto e indicador atual
-    projects[currentProjectIndex].classList.remove('active');
-    indicators[currentProjectIndex].classList.remove('active');
-    
-    // Calcular novo índice (com loop)
-    currentProjectIndex += direction;
-    if (currentProjectIndex >= projects.length) currentProjectIndex = 0;
-    if (currentProjectIndex < 0) currentProjectIndex = projects.length - 1;
-    
-    // Adicionar active ao novo projeto e indicador
-    projects[currentProjectIndex].classList.add('active');
-    indicators[currentProjectIndex].classList.add('active');
-    animateActiveProject(projects[currentProjectIndex]);
+    if (!projects.length) return;
+
+    let newIndex = currentProjectIndex + direction;
+    if (newIndex >= projects.length) newIndex = 0;
+    if (newIndex < 0) newIndex = projects.length - 1;
+
+    transitionToProject(newIndex, direction >= 0 ? 1 : -1);
 }
 
 function setProject(index) {
-    const projects = document.querySelectorAll('.project-card');
-    const indicators = document.querySelectorAll('.project-indicator');
-    
-    if (projects.length === 0) return;
-    
-    // Remover active de todos
-    projects[currentProjectIndex].classList.remove('active');
-    indicators[currentProjectIndex].classList.remove('active');
-    
-    // Adicionar active ao selecionado
-    currentProjectIndex = index;
-    projects[index].classList.add('active');
-    indicators[index].classList.add('active');
-    animateActiveProject(projects[index]);
+    if (index === currentProjectIndex) return;
+    transitionToProject(index, index > currentProjectIndex ? 1 : -1);
 }
 
 window.addEventListener('load', async () => {
